@@ -25,7 +25,7 @@ class UUID
   module VERSION #:nodoc:
     MAJOR = 1
     MINOR = 0
-    TINY  = 4
+    TINY  = 5
 
     STRING = [MAJOR, MINOR, TINY].join('.')
   end
