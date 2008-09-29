@@ -403,7 +403,7 @@ class UUID
       if os_platform =~ /win/ && !(os_platform =~ /darwin/)
         script_in_path = true
       else
-        script_in_path = !(`which ifconfig`.strip =~ /no .+ in/)
+        script_in_path = !(`which ifconfig 2>&1`.strip =~ /no .+ in/)
       end
       if os_platform =~ /solaris/
         begin
