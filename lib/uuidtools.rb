@@ -47,6 +47,8 @@ require 'uuidtools/version'
 #  UUID.random_create
 #  => #<UUID:0x19013a UUID:984265dc-4200-4f02-ae70-fe4f48964159>
 class UUID
+  include Comparable
+
   @@last_timestamp = nil
   @@last_node_id = nil
   @@last_clock_sequence = nil
@@ -78,9 +80,9 @@ class UUID
         "Expected unsigned 8-bit number for clock_seq_low, " +
         "got #{clock_seq_low}."
     end
-    unless nodes.respond_to? :size
-      raise ArgumentError,
-        "Expected nodes to respond to :size."
+    unless nodes.kind_of?(Enumerable)
+      raise TypeError,
+        "Expected Enumerable, got #{nodes.class.name}."
     end
     unless nodes.size == 6
       raise ArgumentError,
@@ -111,7 +113,7 @@ class UUID
   # Parses a UUID from a string.
   def self.parse(uuid_string)
     unless uuid_string.kind_of? String
-      raise ArgumentError,
+      raise TypeError,
         "Expected String, got #{uuid_string.class.name} instead."
     end
     uuid_components = uuid_string.downcase.scan(
@@ -134,7 +136,7 @@ class UUID
   # Parses a UUID from a raw byte string.
   def self.parse_raw(raw_string)
     unless raw_string.kind_of? String
-      raise ArgumentError,
+      raise TypeError,
         "Expected String, got #{raw_string.class.name} instead."
     end
     integer = self.convert_byte_string_to_int(raw_string)
@@ -184,13 +186,8 @@ class UUID
         end
       else
         nodes = self.random_bits(48).split("").map do |chr|
-          if chr.respond_to?(:ord)
-            # Ruby 1.9
-            chr.ord
-          else
-            # Ruby 1.8
-            chr.sum(8)
-          end
+          # Ruby 1.9 / Ruby 1.8
+          chr.respond_to?(:ord) ? chr.ord : chr.sum(8)
         end
         nodes[0] |= 0b00000001
       end
@@ -353,7 +350,7 @@ class UUID
 
   # Returns the hex digest of the UUID object.
   def hexdigest
-    return self.to_i.to_s(16)
+    return self.to_i.to_s(16).rjust(32, "0")
   end
 
   # Returns the raw bytes that represent this UUID.
@@ -394,7 +391,7 @@ class UUID
 
   # Returns true if this UUID is exactly equal to the other UUID.
   def eql?(other)
-    return (self <=> other) == 0
+    return self == other
   end
 
   # Returns the MAC address of the current computer's network card.
@@ -526,7 +523,9 @@ class UUID
     @@mac_address = new_mac_address
   end
 
-protected
+  # The following methods are not part of the public API,
+  # and generally should not be called directly.
+
   # Creates a new UUID from a SHA1 or MD5 hash
   def self.create_from_hash(hash_class, namespace, name) #:nodoc:
     if hash_class == Digest::MD5
@@ -553,17 +552,14 @@ protected
 
   # N bits of unpredictable data.
   def self.random_bits(size=128) #:nodoc:
-    if 128 % 16 != 0
-      raise ArgumentError, "Value must be divisible by 16."
-    end
-    if !defined?(@random_device) || @random_device == nil
+    raise ArgumentError, "Value must be divisible by 16." if size % 16 != 0
+    if !defined?(@random_device)
       begin
         @random_device = nil
-        if File.exists? "/dev/urandom"
-          @random_device = File.open "/dev/urandom", "r"
-        elsif File.exists? "/dev/random"
-          @random_device = File.open "/dev/random", "r"
-        end
+        @random_device =
+          File.open("/dev/urandom", "r") if File.exists?("/dev/urandom")
+        @random_device =
+          File.open("/dev/random", "r") if File.exists?("/dev/random")
       rescue Exception
       end
     end
@@ -586,13 +582,9 @@ protected
     integer = 0
     size = byte_string.size
     for i in 0..(size - 1)
-      if byte_string[i].respond_to?(:ord)
-        # Ruby 1.9
-        integer += (byte_string[i].ord << (((size - 1) - i) * 8))
-      else
-        # Ruby 1.8
-        integer += (byte_string[i] << (((size - 1) - i) * 8))
-      end
+      ordinal = (byte_string[i].respond_to?(:ord) ?
+        byte_string[i].ord : byte_string[i])
+      integer += (ordinal << (((size - 1) - i) * 8))
     end
     return integer
   end
@@ -602,3 +594,9 @@ UUID_DNS_NAMESPACE = UUID.parse("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
 UUID_URL_NAMESPACE = UUID.parse("6ba7b811-9dad-11d1-80b4-00c04fd430c8")
 UUID_OID_NAMESPACE = UUID.parse("6ba7b812-9dad-11d1-80b4-00c04fd430c8")
 UUID_X500_NAMESPACE = UUID.parse("6ba7b814-9dad-11d1-80b4-00c04fd430c8")
+
+at_exit do
+  if UUID.instance_variable_get("@random_device") != nil
+    UUID.instance_variable_get("@random_device").close rescue nil
+  end
+end
