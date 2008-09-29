@@ -1,6 +1,7 @@
 == UUIDTools 1.0.5
  * improved specs
  * fixed minor bugs
+ * better JRuby compatibility
 == UUIDTools 1.0.4
  * calculates random node id with multicast bit if there is no MAC address
  * uses RSpec instead of Test::Unit
