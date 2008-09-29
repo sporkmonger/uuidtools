@@ -21,12 +21,15 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #++
 
-class UUID
-  module VERSION #:nodoc:
-    MAJOR = 1
-    MINOR = 0
-    TINY  = 5
+# Used to prevent the class/module from being loaded more than once
+unless defined? UUID::VERSION
+  class UUID
+    module VERSION #:nodoc:
+      MAJOR = 1
+      MINOR = 0
+      TINY  = 5
 
-    STRING = [MAJOR, MINOR, TINY].join('.')
+      STRING = [MAJOR, MINOR, TINY].join('.')
+    end
   end
 end
