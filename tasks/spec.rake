@@ -4,7 +4,11 @@ namespace :spec do
   Spec::Rake::SpecTask.new(:rcov) do |t|
     t.spec_files = FileList['spec/**/*_spec.rb']
     t.spec_opts = ['--color', '--format', 'specdoc']
-    t.rcov = true
+    if RUBY_PLATFORM != "java"
+      t.rcov = true
+    else
+      t.rcov = false
+    end
     t.rcov_opts = [
       '--exclude', 'spec',
       '--exclude', '1\\.8\\/gems',
@@ -12,12 +16,20 @@ namespace :spec do
     ]
   end
 
-  RCov::VerifyTask.new(:verify) do |t|
-    t.threshold = 100.0
-    t.index_html = 'coverage/index.html'
+  Spec::Rake::SpecTask.new(:normal) do |t|
+    t.spec_files = FileList['spec/**/*_spec.rb']
+    t.spec_opts = ['--color', '--format', 'specdoc']
+    t.rcov = false
   end
 
-  task :verify => :rcov
+  if RUBY_PLATFORM != "java"
+    RCov::VerifyTask.new(:verify) do |t|
+      t.threshold = 100.0
+      t.index_html = 'coverage/index.html'
+    end
+
+    task :verify => :rcov
+  end
 
   desc "Generate HTML Specdocs for all specs"
   Spec::Rake::SpecTask.new(:specdoc) do |t|
@@ -39,8 +51,12 @@ namespace :spec do
   end
 end
 
-desc "Alias to spec:verify"
-task "spec" => "spec:verify"
+if RUBY_PLATFORM != "java"
+  desc "Alias to spec:verify"
+  task "spec" => "spec:verify"
+else
+  task "spec" => "spec:normal"
+end
 
 task "clobber" => ["spec:clobber_rcov"]
 
