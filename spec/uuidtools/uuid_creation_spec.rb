@@ -23,7 +23,7 @@ describe UUID, "when generating" do
     1000.times do
       uuids << UUID.timestamp_create
     end
-    # Check to make sure that none of the 10,000 UUIDs were duplicates
+    # Check to make sure that none of the 1,000 UUIDs were duplicates
     (uuids.map {|x| x.to_s}).uniq.size.should == uuids.size
   end
 
@@ -39,7 +39,7 @@ describe UUID, "when generating" do
     1000.times do
       uuids << UUID.random_create
     end
-    # Check to make sure that none of the 10,000 UUIDs were duplicates
+    # Check to make sure that none of the 1,000 UUIDs were duplicates
     (uuids.map {|x| x.to_s}).uniq.size.should == uuids.size
   end
 
