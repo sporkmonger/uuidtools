@@ -584,9 +584,3 @@ UUID_DNS_NAMESPACE = UUID.parse("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
 UUID_URL_NAMESPACE = UUID.parse("6ba7b811-9dad-11d1-80b4-00c04fd430c8")
 UUID_OID_NAMESPACE = UUID.parse("6ba7b812-9dad-11d1-80b4-00c04fd430c8")
 UUID_X500_NAMESPACE = UUID.parse("6ba7b814-9dad-11d1-80b4-00c04fd430c8")
-
-at_exit do
-  if UUID.instance_variable_get("@random_device") != nil
-    UUID.instance_variable_get("@random_device").close rescue nil
-  end
-end
