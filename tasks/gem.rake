@@ -2,6 +2,11 @@ require "rake/gempackagetask"
 
 namespace :gem do
   GEM_SPEC = Gem::Specification.new do |s|
+    unless s.respond_to?(:add_development_dependency)
+      puts "The gem spec requires a newer version of RubyGems."
+      exit(1)
+    end
+
     s.name = PKG_NAME
     s.version = PKG_VERSION
     s.summary = PKG_SUMMARY
@@ -13,8 +18,9 @@ namespace :gem do
     s.extra_rdoc_files = %w( README )
     s.rdoc_options.concat ["--main",  "README"]
 
-    s.add_dependency("rake", ">= 0.7.3")
-    s.add_dependency("rspec", ">= 1.0.8")
+    s.add_development_dependency("rake", ">= 0.8.3")
+    s.add_development_dependency("rspec", ">= 1.1.11")
+    s.add_development_dependency("launchy", ">= 0.3.2")
 
     s.require_path = "lib"
 
