@@ -377,6 +377,7 @@ class UUID
     end
     return result.downcase
   end
+  alias_method :to_str, :to_s
 
   # Returns an integer representation for this UUID.
   def to_i
