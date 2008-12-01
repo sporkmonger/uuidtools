@@ -31,6 +31,12 @@ require 'digest/md5'
 
 require 'uuidtools/version'
 
+begin
+  require 'securerandom'
+rescue LoadError
+  require File.join(File.dirname(__FILE__), 'compat', 'securerandom')
+end
+
 #= uuidtools.rb
 #
 # UUIDTools was designed to be a simple library for generating any
@@ -156,7 +162,7 @@ class UUID
 
   # Creates a UUID from a random value.
   def self.random_create()
-    new_uuid = self.parse_raw(self.random_bits)
+    new_uuid = self.parse_raw(SecureRandom.random_bytes(16))
     new_uuid.time_hi_and_version &= 0x0FFF
     new_uuid.time_hi_and_version |= (4 << 12)
     new_uuid.clock_seq_hi_and_reserved &= 0x3F
@@ -185,7 +191,7 @@ class UUID
           octet.to_i(16)
         end
       else
-        nodes = self.random_bits(48).split("").map do |chr|
+        nodes = SecureRandom.random_bytes(6).split("").map do |chr|
           # Ruby 1.9 / Ruby 1.8
           chr.respond_to?(:ord) ? chr.ord : chr.sum(8)
         end
@@ -196,11 +202,15 @@ class UUID
       end
       clock_sequence = @@last_clock_sequence
       if clock_sequence.nil?
-        clock_sequence = self.convert_byte_string_to_int(self.random_bits)
+        clock_sequence = self.convert_byte_string_to_int(
+          SecureRandom.random_bytes(16)
+        )
       end
       if @@last_node_id != nil && @@last_node_id != node_id
         # The node id has changed.  Change the clock id.
-        clock_sequence = self.convert_byte_string_to_int(self.random_bits)
+        clock_sequence = self.convert_byte_string_to_int(
+          SecureRandom.random_bytes(16)
+        )
       elsif @@last_timestamp != nil &&
           gmt_timestamp_100_nanoseconds <= @@last_timestamp
         clock_sequence = clock_sequence + 1
@@ -548,26 +558,6 @@ class UUID
     new_uuid.clock_seq_hi_and_reserved &= 0x3F
     new_uuid.clock_seq_hi_and_reserved |= 0x80
     return new_uuid
-  end
-
-  # N bits of unpredictable data.
-  def self.random_bits(size=128) #:nodoc:
-    raise ArgumentError, "Value must be divisible by 16." if size % 16 != 0
-    if !defined?(@random_device)
-      begin
-        @random_device = nil
-        @random_device =
-          File.open("/dev/urandom", "r") if File.exists?("/dev/urandom")
-        @random_device =
-          File.open("/dev/random", "r") if File.exists?("/dev/random")
-      rescue Exception
-      end
-    end
-    begin
-      return @random_device.read(size / 8) if @random_device != nil
-    rescue Exception
-    end
-    return (1..(size / 16)).to_a.map { rand(0x10000) }.pack("n#{size / 16}")
   end
 
   def self.convert_int_to_byte_string(integer, size) #:nodoc:
