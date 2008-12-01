@@ -33,165 +33,167 @@
 # p SecureRandom.random_bytes(10) #=> "\323U\030TO\234\357\020\a\337"
 # ...
 
-begin
-  require 'openssl'
-rescue LoadError
-end
+if !defined?(SecureRandom)
+  begin
+    require 'openssl'
+  rescue LoadError
+  end
 
-module SecureRandom
-  # SecureRandom.random_bytes generates a random binary string.
-  #
-  # The argument n specifies the length of the result string.
-  #
-  # If n is not specified, 16 is assumed.
-  # It may be larger in future.
-  #
-  # If secure random number generator is not available,
-  # NotImplementedError is raised.
-  def self.random_bytes(n=nil)
-    n ||= 16
+  module SecureRandom
+    # SecureRandom.random_bytes generates a random binary string.
+    #
+    # The argument n specifies the length of the result string.
+    #
+    # If n is not specified, 16 is assumed.
+    # It may be larger in future.
+    #
+    # If secure random number generator is not available,
+    # NotImplementedError is raised.
+    def self.random_bytes(n=nil)
+      n ||= 16
 
-    if defined? OpenSSL::Random
-      return OpenSSL::Random.random_bytes(n)
-    end
-
-    if !defined?(@has_urandom) || @has_urandom
-      flags = File::RDONLY
-      flags |= File::NONBLOCK if defined? File::NONBLOCK
-      flags |= File::NOCTTY if defined? File::NOCTTY
-      flags |= File::NOFOLLOW if defined? File::NOFOLLOW
-      begin
-        File.open("/dev/urandom", flags) {|f|
-          unless f.stat.chardev?
-            raise Errno::ENOENT
-          end
-          @has_urandom = true
-          ret = f.readpartial(n)
-          if ret.length != n
-            raise NotImplementedError,
-              "Unexpected partial read from random device"
-          end
-          return ret
-        }
-      rescue Errno::ENOENT
-        @has_urandom = false
+      if defined? OpenSSL::Random
+        return OpenSSL::Random.random_bytes(n)
       end
-    end
 
-    if !defined?(@has_win32)
-      begin
-        require 'Win32API'
-
-        crypt_acquire_context = Win32API.new(
-          "advapi32", "CryptAcquireContext", 'PPPII', 'L'
-        )
-        @crypt_gen_random = Win32API.new(
-          "advapi32", "CryptGenRandom", 'LIP', 'L'
-        )
-
-        hProvStr = " " * 4
-        prov_rsa_full = 1
-        crypt_verifycontext = 0xF0000000
-
-        if crypt_acquire_context.call(
-            hProvStr, nil, nil, prov_rsa_full, crypt_verifycontext) == 0
-          raise SystemCallError,
-            "CryptAcquireContext failed: #{lastWin32ErrorMessage}"
+      if !defined?(@has_urandom) || @has_urandom
+        flags = File::RDONLY
+        flags |= File::NONBLOCK if defined? File::NONBLOCK
+        flags |= File::NOCTTY if defined? File::NOCTTY
+        flags |= File::NOFOLLOW if defined? File::NOFOLLOW
+        begin
+          File.open("/dev/urandom", flags) {|f|
+            unless f.stat.chardev?
+              raise Errno::ENOENT
+            end
+            @has_urandom = true
+            ret = f.readpartial(n)
+            if ret.length != n
+              raise NotImplementedError,
+                "Unexpected partial read from random device"
+            end
+            return ret
+          }
+        rescue Errno::ENOENT
+          @has_urandom = false
         end
-        @hProv, = hProvStr.unpack('L')
+      end
 
-        @has_win32 = true
-      rescue LoadError
-        @has_win32 = false
+      if !defined?(@has_win32)
+        begin
+          require 'Win32API'
+
+          crypt_acquire_context = Win32API.new(
+            "advapi32", "CryptAcquireContext", 'PPPII', 'L'
+          )
+          @crypt_gen_random = Win32API.new(
+            "advapi32", "CryptGenRandom", 'LIP', 'L'
+          )
+
+          hProvStr = " " * 4
+          prov_rsa_full = 1
+          crypt_verifycontext = 0xF0000000
+
+          if crypt_acquire_context.call(
+              hProvStr, nil, nil, prov_rsa_full, crypt_verifycontext) == 0
+            raise SystemCallError,
+              "CryptAcquireContext failed: #{lastWin32ErrorMessage}"
+          end
+          @hProv, = hProvStr.unpack('L')
+
+          @has_win32 = true
+        rescue LoadError
+          @has_win32 = false
+        end
+      end
+      if @has_win32
+        bytes = " " * n
+        if @crypt_gen_random.call(@hProv, bytes.size, bytes) == 0
+          raise SystemCallError,
+            "CryptGenRandom failed: #{lastWin32ErrorMessage}"
+        end
+        return bytes
+      end
+
+      raise NotImplementedError, "No random device"
+    end
+
+    # SecureRandom.hex generates a random hex string.
+    #
+    # The argument n specifies the length of the random length.
+    # The length of the result string is twice of n.
+    #
+    # If n is not specified, 16 is assumed.
+    # It may be larger in future.
+    #
+    # If secure random number generator is not available,
+    # NotImplementedError is raised.
+    def self.hex(n=nil)
+      random_bytes(n).unpack("H*")[0]
+    end
+
+    # SecureRandom.base64 generates a random base64 string.
+    #
+    # The argument n specifies the length of the random length.
+    # The length of the result string is about 4/3 of n.
+    #
+    # If n is not specified, 16 is assumed.
+    # It may be larger in future.
+    #
+    # If secure random number generator is not available,
+    # NotImplementedError is raised.
+    def self.base64(n=nil)
+      [random_bytes(n)].pack("m*").delete("\n")
+    end
+
+    # SecureRandom.random_number generates a random number.
+    #
+    # If an positive integer is given as n,
+    # SecureRandom.random_number returns an integer:
+    # 0 <= SecureRandom.random_number(n) < n.
+    #
+    # If 0 is given or an argument is not given,
+    # SecureRandom.random_number returns an float:
+    # 0.0 <= SecureRandom.random_number() < 1.0.
+    def self.random_number(n=0)
+      if 0 < n
+        hex = n.to_s(16)
+        hex = '0' + hex if (hex.length & 1) == 1
+        bin = [hex].pack("H*")
+        mask = bin[0].ord
+        mask |= mask >> 1
+        mask |= mask >> 2
+        mask |= mask >> 4
+        begin
+          rnd = SecureRandom.random_bytes(bin.length)
+          rnd[0] = (rnd[0].ord & mask).chr
+        end until rnd < bin
+        rnd.unpack("H*")[0].hex
+      else
+        # assumption: Float::MANT_DIG <= 64
+        i64 = SecureRandom.random_bytes(8).unpack("Q")[0]
+        Math.ldexp(i64 >> (64-Float::MANT_DIG), -Float::MANT_DIG)
       end
     end
-    if @has_win32
-      bytes = " " * n
-      if @crypt_gen_random.call(@hProv, bytes.size, bytes) == 0
-        raise SystemCallError,
-          "CryptGenRandom failed: #{lastWin32ErrorMessage}"
-      end
-      return bytes
+
+    # Following code is based on David Garamond's GUID library for Ruby.
+    def self.lastWin32ErrorMessage # :nodoc:
+      get_last_error = Win32API.new(
+        "kernel32", "GetLastError", '', 'L'
+      )
+      format_message = Win32API.new(
+        "kernel32", "FormatMessageA", 'LPLLPLPPPPPPPP', 'L'
+      )
+      format_message_ignore_inserts = 0x00000200
+      format_message_from_system    = 0x00001000
+
+      code = get_last_error.call
+      msg = "\0" * 1024
+      len = format_message.call(
+        format_message_ignore_inserts + format_message_from_system,
+        0, code, 0, msg, 1024, nil, nil, nil, nil, nil, nil, nil, nil
+      )
+      msg[0, len].tr("\r", '').chomp
     end
-
-    raise NotImplementedError, "No random device"
-  end
-
-  # SecureRandom.hex generates a random hex string.
-  #
-  # The argument n specifies the length of the random length.
-  # The length of the result string is twice of n.
-  #
-  # If n is not specified, 16 is assumed.
-  # It may be larger in future.
-  #
-  # If secure random number generator is not available,
-  # NotImplementedError is raised.
-  def self.hex(n=nil)
-    random_bytes(n).unpack("H*")[0]
-  end
-
-  # SecureRandom.base64 generates a random base64 string.
-  #
-  # The argument n specifies the length of the random length.
-  # The length of the result string is about 4/3 of n.
-  #
-  # If n is not specified, 16 is assumed.
-  # It may be larger in future.
-  #
-  # If secure random number generator is not available,
-  # NotImplementedError is raised.
-  def self.base64(n=nil)
-    [random_bytes(n)].pack("m*").delete("\n")
-  end
-
-  # SecureRandom.random_number generates a random number.
-  #
-  # If an positive integer is given as n,
-  # SecureRandom.random_number returns an integer:
-  # 0 <= SecureRandom.random_number(n) < n.
-  #
-  # If 0 is given or an argument is not given,
-  # SecureRandom.random_number returns an float:
-  # 0.0 <= SecureRandom.random_number() < 1.0.
-  def self.random_number(n=0)
-    if 0 < n
-      hex = n.to_s(16)
-      hex = '0' + hex if (hex.length & 1) == 1
-      bin = [hex].pack("H*")
-      mask = bin[0].ord
-      mask |= mask >> 1
-      mask |= mask >> 2
-      mask |= mask >> 4
-      begin
-        rnd = SecureRandom.random_bytes(bin.length)
-        rnd[0] = (rnd[0].ord & mask).chr
-      end until rnd < bin
-      rnd.unpack("H*")[0].hex
-    else
-      # assumption: Float::MANT_DIG <= 64
-      i64 = SecureRandom.random_bytes(8).unpack("Q")[0]
-      Math.ldexp(i64 >> (64-Float::MANT_DIG), -Float::MANT_DIG)
-    end
-  end
-
-  # Following code is based on David Garamond's GUID library for Ruby.
-  def self.lastWin32ErrorMessage # :nodoc:
-    get_last_error = Win32API.new(
-      "kernel32", "GetLastError", '', 'L'
-    )
-    format_message = Win32API.new(
-      "kernel32", "FormatMessageA", 'LPLLPLPPPPPPPP', 'L'
-    )
-    format_message_ignore_inserts = 0x00000200
-    format_message_from_system    = 0x00001000
-
-    code = get_last_error.call
-    msg = "\0" * 1024
-    len = format_message.call(
-      format_message_ignore_inserts + format_message_from_system,
-      0, code, 0, msg, 1024, nil, nil, nil, nil, nil, nil, nil, nil
-    )
-    msg[0, len].tr("\r", '').chomp
   end
 end
