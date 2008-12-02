@@ -381,13 +381,15 @@ class UUID
 
   # Returns an integer representation for this UUID.
   def to_i
-    bytes = (time_low << 96) + (time_mid << 80) +
-      (time_hi_and_version << 64) + (clock_seq_hi_and_reserved << 56) +
-      (clock_seq_low << 48)
-    for i in 0..5
-      bytes += (nodes[i] << (40 - (i * 8)))
-    end
-    return bytes
+    @integer ||= (begin
+      bytes = (time_low << 96) + (time_mid << 80) +
+        (time_hi_and_version << 64) + (clock_seq_hi_and_reserved << 56) +
+        (clock_seq_low << 48)
+      for i in 0..5
+        bytes += (nodes[i] << (40 - (i * 8)))
+      end
+      bytes
+    end)
   end
 
   # Returns a URI string for this UUID.
@@ -397,7 +399,7 @@ class UUID
 
   # Returns an integer hash value.
   def hash
-    return self.to_i
+    @hash ||= self.to_i % 0x3fffffff
   end
 
   # Returns true if this UUID is exactly equal to the other UUID.

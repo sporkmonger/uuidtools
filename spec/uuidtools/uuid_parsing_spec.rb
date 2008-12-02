@@ -90,7 +90,9 @@ describe UUID, "when parsing" do
   end
 
   it "should produce a sane hash value for a UUID" do
-    UUID.new(0, 0, 0, 0, 0, [0, 0, 0, 0, 0, 0]).hash.should == 0
+    uuid = UUID.new(0, 0, 0, 0, 0, [0, 0, 0, 0, 0, 0])
+    uuid.to_i.should == 0
+    uuid.hash.should be_kind_of(Fixnum)
   end
 
   it "should produce the correct URI for a UUID" do
