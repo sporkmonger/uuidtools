@@ -160,13 +160,16 @@ if !defined?(SecureRandom)
         hex = n.to_s(16)
         hex = '0' + hex if (hex.length & 1) == 1
         bin = [hex].pack("H*")
-        mask = bin[0].ord
+        first = bin[0..0]
+        mask = first.respond_to?(:ord) ? first.ord : first.sum(8)
         mask |= mask >> 1
         mask |= mask >> 2
         mask |= mask >> 4
         begin
           rnd = SecureRandom.random_bytes(bin.length)
-          rnd[0] = (rnd[0].ord & mask).chr
+          first = rnd[0..0]
+          ordinal = first.respond_to?(:ord) ? first.ord : first.sum(8)
+          rnd[0..0] = (ordinal & mask).chr
         end until rnd < bin
         rnd.unpack("H*")[0].hex
       else
