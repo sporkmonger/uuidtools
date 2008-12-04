@@ -1,3 +1,6 @@
+== UUIDTools 1.0.6
+ * fixed Bignum hash issue
+ * added implicit to_str cast
 == UUIDTools 1.0.5
  * improved specs
  * fixed minor bugs
