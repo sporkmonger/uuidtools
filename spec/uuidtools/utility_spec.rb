@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), "../spec_helper.rb")
 
-describe UUID, "when using utility methods" do
+describe SecureRandom do
   it "should correctly obtain random bits" do
     bits = []
     1000.times do
@@ -13,5 +13,9 @@ describe UUID, "when using utility methods" do
   it "should return the correct number of random bits" do
     SecureRandom.random_bytes(16).size.should == 16
     SecureRandom.random_bytes(6).size.should == 6
+  end
+
+  it "should return a sane random number" do
+    SecureRandom.random_number(5000).should < 5000
   end
 end
