@@ -25,9 +25,9 @@
 unless defined? UUID::VERSION
   class UUID
     module VERSION #:nodoc:
-      MAJOR = 1
+      MAJOR = 2
       MINOR = 0
-      TINY  = 7
+      TINY  = 0
 
       STRING = [MAJOR, MINOR, TINY].join('.')
     end

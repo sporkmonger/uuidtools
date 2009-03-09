@@ -1,8 +1,8 @@
 require File.join(File.dirname(__FILE__), "../spec_helper.rb")
 
-describe UUID, "when obtaining a MAC address" do
+describe UUIDTools::UUID, "when obtaining a MAC address" do
   before do
-    @mac_address = UUID.mac_address
+    @mac_address = UUIDTools::UUID.mac_address
   end
 
   it "should obtain a MAC address" do
@@ -10,6 +10,6 @@ describe UUID, "when obtaining a MAC address" do
   end
 
   it "should cache the MAC address" do
-    @mac_address.object_id.should == UUID.mac_address.object_id
+    @mac_address.object_id.should == UUIDTools::UUID.mac_address.object_id
   end
 end
