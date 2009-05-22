@@ -412,7 +412,8 @@ module UUIDTools
       if !defined?(@@mac_address)
         require 'rbconfig'
         os_platform = Config::CONFIG['target_os']
-        if os_platform =~ /win/ && !(os_platform =~ /darwin/)
+        if (os_platform =~ /win/ && !(os_platform =~ /darwin/)) ||
+            os_platform =~ /w32/
           script_in_path = true
         else
           script_in_path = Kernel.system("which ifconfig 2>&1 > /dev/null")
