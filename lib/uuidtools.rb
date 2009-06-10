@@ -412,13 +412,36 @@ module UUIDTools
       if !defined?(@@mac_address)
         require 'rbconfig'
         os_platform = Config::CONFIG['target_os']
-        if (os_platform =~ /win/ && !(os_platform =~ /darwin/)) ||
-            os_platform =~ /w32/
+        os_class = nil
+        if (os_platform =~ /win/i && !(os_platform =~ /darwin/i)) ||
+            os_platform =~ /w32/i
+          os_class = :windows
+        elsif os_platform =~ /solaris/i
+          os_class = :solaris
+        elsif os_platform =~ /netbsd/i
+          os_class = :netbsd
+        elsif os_platform =~ /openbsd/i
+          os_class = :openbsd
+        end
+        mac_regexps = [
+          Regexp.new("address\:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
+          Regexp.new("addr\:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
+          Regexp.new("ether\:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
+          Regexp.new("(#{(["[0-9a-fA-F]{2}"] * 6).join("-")})"),
+          Regexp.new("(#{(["[0-9a-fA-F]{2}"] * 6).join(":")})")
+        ]
+        parse_mac = lambda do |output|
+          (mac_regexps.map do |regexp|
+            result = output[regexp, 1]
+            result.downcase.gsub(/-/, ":") if result != nil
+          end).compact.first
+        end
+        if os_class == :windows
           script_in_path = true
         else
           script_in_path = Kernel.system("which ifconfig 2>&1 > /dev/null")
         end
-        if os_platform =~ /solaris/
+        if os_class == :solaris
           begin
             ifconfig_output =
               (script_in_path ? `ifconfig -a` : `/sbin/ifconfig -a`)
@@ -439,73 +462,55 @@ module UUIDTools
             rescue Exception
             end
           end
-        elsif os_platform =~ /win/ && !(os_platform =~ /darwin/)
+        elsif os_class == :windows
           begin
-            ifconfig_output = `ipconfig /all`
-            mac_addresses = ifconfig_output.scan(
-              Regexp.new("(#{(["[0-9a-fA-F]{2}"] * 6).join("-")})"))
-            if mac_addresses.size > 0
-              @@mac_address = mac_addresses.first.first.downcase.gsub(/-/, ":")
-            end
+            @@mac_address = parse_mac.call(`ipconfig /all`)
           rescue
           end
         else
           begin
-            mac_addresses = []
-            if os_platform =~ /netbsd/
-              ifconfig_output =
-                (script_in_path ? `ifconfig -a 2>&1` : `/sbin/ifconfig -a 2>&1`)
-              mac_addresses = ifconfig_output.scan(
-                Regexp.new("address\: (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"))
-            elsif os_platform =~ /openbsd/
-              ifconfig_output = `/sbin/ifconfig -a 2>&1`
-              ifconfig_output =
-                (script_in_path ? `ifconfig -a 2>&1` : `/sbin/ifconfig -a 2>&1`)
-              mac_addresses = ifconfig_output.scan(
-                Regexp.new("addr (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"))
+            if os_class == :netbsd
+              @@mac_address = parse_mac.call(
+                script_in_path ? `ifconfig -a 2>&1` : `/sbin/ifconfig -a 2>&1`
+              )
+            elsif os_class == :openbsd
+              @@mac_address = parse_mac.call(
+                script_in_path ? `ifconfig -a 2>&1` : `/sbin/ifconfig -a 2>&1`
+              )
             elsif File.exists?('/sbin/ifconfig')
-              ifconfig_output =
-                (script_in_path ? `ifconfig 2>&1` : `/sbin/ifconfig 2>&1`)
-              mac_addresses = ifconfig_output.scan(
-                Regexp.new("ether (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"))
-              if mac_addresses.size == 0
-                ifconfig_output =
-                  (script_in_path ?
-                    `ifconfig -a 2>&1` : `/sbin/ifconfig -a 2>&1`)
-                mac_addresses = ifconfig_output.scan(
-                  Regexp.new("ether (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"))
+              @@mac_address = parse_mac.call(
+                script_in_path ? `ifconfig 2>&1` : `/sbin/ifconfig 2>&1`
+              )
+              if @@mac_address == nil
+                @@mac_address = parse_mac.call(
+                  script_in_path ?
+                    `ifconfig -a 2>&1` : `/sbin/ifconfig -a 2>&1`
+                )
               end
-              if mac_addresses.size == 0
-                ifconfig_output =
-                  (script_in_path ?
+              if @@mac_address == nil
+                @@mac_address = parse_mac.call(
+                  script_in_path ?
                     `ifconfig | grep HWaddr | cut -c39- 2>&1` :
-                    `/sbin/ifconfig | grep HWaddr | cut -c39- 2>&1`)
-                mac_addresses = ifconfig_output.scan(
-                  Regexp.new("(#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"))
+                    `/sbin/ifconfig | grep HWaddr | cut -c39- 2>&1`
+                )
               end
             else
-              ifconfig_output =
-                (script_in_path ? `ifconfig 2>&1` : `/sbin/ifconfig 2>&1`)
-              mac_addresses = ifconfig_output.scan(
-                Regexp.new("ether (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"))
-              if mac_addresses.size == 0
-                ifconfig_output =
-                  (script_in_path ?
-                    `ifconfig -a 2>&1` : `/sbin/ifconfig -a 2>&1`)
-                mac_addresses = ifconfig_output.scan(
-                  Regexp.new("ether (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"))
+              @@mac_address = parse_mac.call(
+                script_in_path ? `ifconfig 2>&1` : `/sbin/ifconfig 2>&1`
+              )
+              if @@mac_address == nil
+                @@mac_address = parse_mac.call(
+                  script_in_path ?
+                    `ifconfig -a 2>&1` : `/sbin/ifconfig -a 2>&1`
+                )
               end
-              if mac_addresses.size == 0
-                ifconfig_output =
-                  (script_in_path ?
+              if @@mac_address == nil
+                @@mac_address = parse_mac.call(
+                  script_in_path ?
                     `ifconfig | grep HWaddr | cut -c39- 2>&1` :
-                    `/sbin/ifconfig | grep HWaddr | cut -c39- 2>&1`)
-                mac_addresses = ifconfig_output.scan(
-                  Regexp.new("(#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"))
+                    `/sbin/ifconfig | grep HWaddr | cut -c39- 2>&1`
+                )
               end
-            end
-            if mac_addresses.size > 0
-              @@mac_address = mac_addresses.first.first
             end
           rescue
           end
