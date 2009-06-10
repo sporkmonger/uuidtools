@@ -424,11 +424,11 @@ module UUIDTools
           os_class = :openbsd
         end
         mac_regexps = [
-          Regexp.new("address\:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
-          Regexp.new("addr\:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
-          Regexp.new("ether\:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
-          Regexp.new("(#{(["[0-9a-fA-F]{2}"] * 6).join("-")})"),
-          Regexp.new("(#{(["[0-9a-fA-F]{2}"] * 6).join(":")})")
+          Regexp.new("address:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
+          Regexp.new("addr:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
+          Regexp.new("ether:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
+          Regexp.new("(#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
+          Regexp.new("(#{(["[0-9a-fA-F]{2}"] * 6).join("-")})")
         ]
         parse_mac = lambda do |output|
           (mac_regexps.map do |regexp|
