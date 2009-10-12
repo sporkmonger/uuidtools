@@ -192,8 +192,7 @@ module UUIDTools
             octet.to_i(16)
           end
         else
-          nodes = []
-          SecureRandom.random_bytes(6).each_byte { |chr| nodes << chr }
+          nodes = SecureRandom.random_bytes(6).unpack("C*")
           nodes[0] |= 0b00000001
         end
         for i in 0..5
