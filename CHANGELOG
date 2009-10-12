@@ -1,3 +1,5 @@
+== UUIDTools 2.1.0
+ * completely reworked the MAC address detection code
 == UUIDTools 2.0.0
  * moved to its own module to avoid collisions
 == UUIDTools 1.0.7
