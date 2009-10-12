@@ -161,6 +161,24 @@ module UUIDTools
         clock_seq_hi_and_reserved, clock_seq_low, nodes)
     end
 
+    # Parses a UUID from an Integer.
+    def self.parse_int(uuid_int)
+      unless uuid_int.kind_of?(Integer)
+        raise ArgumentError,
+          "Expected Integer, got #{uuid_int.class.name} instead."
+      end
+      return self.parse_raw(self.convert_int_to_byte_string(uuid_int, 16))
+    end
+
+    # Parse a UUID from a hexdigest String.
+    def self.parse_hexdigest(uuid_hexdigest)
+      unless uuid_hexdigest.kind_of?(String)
+        raise ArgumentError,
+          "Expected String, got #{uuid_hexdigest.class.name} instead."
+      end
+      return self.parse_int(uuid_hexdigest.to_i(16))
+    end
+
     # Creates a UUID from a random value.
     def self.random_create()
       new_uuid = self.parse_raw(SecureRandom.random_bytes(16))
