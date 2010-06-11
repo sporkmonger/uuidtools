@@ -376,36 +376,43 @@ module UUIDTools
 
     # Returns the hex digest of the UUID object.
     def hexdigest
-      return self.to_i.to_s(16).rjust(32, "0")
+      return @hexdigest unless @hexdigest.nil?
+      if self.frozen?
+        return generate_hexdigest
+      else
+        return (@hexdigest = generate_hexdigest)
+      end
     end
 
     # Returns the raw bytes that represent this UUID.
     def raw
-      return self.class.convert_int_to_byte_string(self.to_i, 16)
+      return @raw unless @raw.nil?
+      if self.frozen?
+        return generate_raw
+      else
+        return (@raw = generate_raw)
+      end
     end
 
     # Returns a string representation for this UUID.
     def to_s
-      result = sprintf("%8.8x-%4.4x-%4.4x-%2.2x%2.2x-", @time_low, @time_mid,
-        @time_hi_and_version, @clock_seq_hi_and_reserved, @clock_seq_low);
-      for i in 0..5
-        result << sprintf("%2.2x", @nodes[i])
+      return @string unless @string.nil?
+      if self.frozen?
+        return generate_s
+      else
+        return (@string = generate_s)
       end
-      return result.downcase
     end
     alias_method :to_str, :to_s
 
     # Returns an integer representation for this UUID.
     def to_i
-      @integer ||= (begin
-        bytes = (time_low << 96) + (time_mid << 80) +
-          (time_hi_and_version << 64) + (clock_seq_hi_and_reserved << 56) +
-          (clock_seq_low << 48)
-        for i in 0..5
-          bytes += (nodes[i] << (40 - (i * 8)))
-        end
-        bytes
-      end)
+      return @integer unless @integer.nil?
+      if self.frozen?
+        return generate_i
+      else
+        return (@integer = generate_i)
+      end
     end
 
     # Returns a URI string for this UUID.
@@ -415,8 +422,56 @@ module UUIDTools
 
     # Returns an integer hash value.
     def hash
-      @hash ||= self.to_i % 0x3fffffff
+      return @hash unless @hash.nil?
+      if self.frozen?
+        return generate_hash
+      else
+        return (@hash = generate_hash)
+      end
     end
+
+    #These methods generate the appropriate representations the above methods cache
+    protected
+    
+    # Generates the hex digest of the UUID object.
+    def generate_hexdigest
+      return self.to_i.to_s(16).rjust(32, "0")
+    end
+    
+    # Generates an integer hash value.
+    def generate_hash
+      return self.to_i % 0x3fffffff
+    end
+    
+    # Generates an integer representation for this UUID.
+    def generate_i
+      return (begin
+        bytes = (time_low << 96) + (time_mid << 80) +
+          (time_hi_and_version << 64) + (clock_seq_hi_and_reserved << 56) +
+          (clock_seq_low << 48)
+        for i in 0..5
+          bytes += (nodes[i] << (40 - (i * 8)))
+        end
+        bytes
+      end)
+    end
+    
+    # Generates a string representation for this UUID.
+    def generate_s
+      result = sprintf("%8.8x-%4.4x-%4.4x-%2.2x%2.2x-", @time_low, @time_mid,
+        @time_hi_and_version, @clock_seq_hi_and_reserved, @clock_seq_low);
+      for i in 0..5
+        result << sprintf("%2.2x", @nodes[i])
+      end
+      return result.downcase
+    end
+    
+    # Generates the raw bytes that represent this UUID.
+    def generate_raw
+      return self.class.convert_int_to_byte_string(self.to_i, 16)
+    end
+    
+    public
 
     # Returns true if this UUID is exactly equal to the other UUID.
     def eql?(other)
