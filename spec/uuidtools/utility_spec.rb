@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), "../spec_helper.rb")
+require File.expand_path("../../spec_helper.rb", __FILE__)
 
 describe SecureRandom do
   it "should correctly obtain random bits" do

@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), "../spec_helper.rb")
+require File.expand_path("../../spec_helper.rb", __FILE__)
 
 describe UUIDTools::UUID, "when generating" do
   it "should correctly generate SHA1 variant UUIDs" do
