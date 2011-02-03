@@ -1,3 +1,6 @@
+== UUIDTools 2.1.2
+ * fixed issue with frozen objects
+ * fixed issue with running specs in Ruby 1.9.2
 == UUIDTools 2.1.1
  * fixed issue with Ruby 1.9 compatibility
 == UUIDTools 2.1.0
