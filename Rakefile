@@ -14,7 +14,7 @@ require File.join(File.dirname(__FILE__), 'lib/uuidtools', 'version')
 
 PKG_DISPLAY_NAME   = 'UUIDTools'
 PKG_NAME           = PKG_DISPLAY_NAME.downcase
-PKG_VERSION        = UUID::VERSION::STRING
+PKG_VERSION        = UUIDTools::VERSION::STRING
 PKG_FILE_NAME      = "#{PKG_NAME}-#{PKG_VERSION}"
 
 RELEASE_NAME       = "REL #{PKG_VERSION}"

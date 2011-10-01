@@ -22,8 +22,8 @@
 #++
 
 # Used to prevent the class/module from being loaded more than once
-unless defined? UUID::VERSION
-  class UUID
+unless defined? UUIDTools::VERSION
+  module UUIDTools
     module VERSION #:nodoc:
       MAJOR = 2
       MINOR = 1
