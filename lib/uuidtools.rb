@@ -376,43 +376,23 @@ module UUIDTools
 
     # Returns the hex digest of the UUID object.
     def hexdigest
-      return @hexdigest unless @hexdigest.nil?
-      if self.frozen?
-        return generate_hexdigest
-      else
-        return (@hexdigest = generate_hexdigest)
-      end
+      self.frozen? ? generate_hexdigest : (@hexdigest ||= generate_hexdigest)
     end
 
     # Returns the raw bytes that represent this UUID.
     def raw
-      return @raw unless @raw.nil?
-      if self.frozen?
-        return generate_raw
-      else
-        return (@raw = generate_raw)
-      end
+      self.frozen? ? generate_raw : (@raw ||= generate_raw)
     end
 
     # Returns a string representation for this UUID.
     def to_s
-      return @string unless @string.nil?
-      if self.frozen?
-        return generate_s
-      else
-        return (@string = generate_s)
-      end
+      self.frozen? ? generate_s : (@string ||= generate_s)
     end
     alias_method :to_str, :to_s
 
     # Returns an integer representation for this UUID.
     def to_i
-      return @integer unless @integer.nil?
-      if self.frozen?
-        return generate_i
-      else
-        return (@integer = generate_i)
-      end
+      self.frozen? ? generate_i : (@integer ||= generate_i)
     end
 
     # Returns a URI string for this UUID.
@@ -422,12 +402,7 @@ module UUIDTools
 
     # Returns an integer hash value.
     def hash
-      return @hash unless @hash.nil?
-      if self.frozen?
-        return generate_hash
-      else
-        return (@hash = generate_hash)
-      end
+      self.frozen? ? generate_hash : (@hash ||= generate_hash)
     end
 
     #These methods generate the appropriate representations the above methods cache
