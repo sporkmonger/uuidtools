@@ -458,7 +458,7 @@ module UUIDTools
     def self.mac_address #:nodoc:
       if !defined?(@@mac_address)
         require 'rbconfig'
-        os_platform = Config::CONFIG['target_os']
+        os_platform = RbConfig::CONFIG['target_os']
         os_class = nil
         if (os_platform =~ /win/i && !(os_platform =~ /darwin/i)) ||
             os_platform =~ /w32/i
