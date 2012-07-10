@@ -13,7 +13,7 @@ describe UUIDTools::UUID, "when generating" do
     ).to_s.should == "15074785-9071-3fe3-89bd-876e4b9e919b"
   end
 
-  it "should correctly generate timestamp variant UUIDs" do
+  it "should correctly generate timestamp variant UUIDs", :unless => UUIDTools::UUID.mac_address.nil? do
     UUIDTools::UUID.timestamp_create.should_not be_random_node_id
     UUIDTools::UUID.timestamp_create.to_s.should_not ==
       UUIDTools::UUID.timestamp_create.to_s

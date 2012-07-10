@@ -23,7 +23,7 @@ describe UUIDTools::UUID, "when parsing" do
     UUIDTools::UUID.timestamp_create.should_not be_nil_uuid
   end
 
-  it "should not treat a timestamp version UUID as a random node UUID" do
+  it "should not treat a timestamp version UUID as a random node UUID", :unless => UUIDTools::UUID.mac_address.nil? do
     UUIDTools::UUID.timestamp_create.should_not be_random_node_id
   end
 
