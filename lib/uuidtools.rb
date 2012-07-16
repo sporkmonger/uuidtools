@@ -1,25 +1,20 @@
+# encoding:utf-8
 #--
-# UUIDTools, Copyright (c) 2005-2008 Bob Aman
+# Copyright (C) 2005-2012 Bob Aman
 #
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files (the
-# "Software"), to deal in the Software without restriction, including
-# without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject to
-# the following conditions:
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
 #
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
+#        http://www.apache.org/licenses/LICENSE-2.0
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
 #++
+
 
 $:.unshift(File.dirname(__FILE__))
 
@@ -38,30 +33,50 @@ rescue LoadError
 end
 
 module UUIDTools
-  #= uuidtools.rb
-  #
+  ##
   # UUIDTools was designed to be a simple library for generating any
   # of the various types of UUIDs.  It conforms to RFC 4122 whenever
   # possible.
   #
-  #== Example
-  #  UUID.md5_create(UUID_DNS_NAMESPACE, "www.widgets.com")
-  #  => #<UUID:0x287576 UUID:3d813cbb-47fb-32ba-91df-831e1593ac29>
-  #  UUID.sha1_create(UUID_DNS_NAMESPACE, "www.widgets.com")
-  #  => #<UUID:0x2a0116 UUID:21f7f8de-8051-5b89-8680-0195ef798b6a>
-  #  UUID.timestamp_create
-  #  => #<UUID:0x2adfdc UUID:64a5189c-25b3-11da-a97b-00c04fd430c8>
-  #  UUID.random_create
-  #  => #<UUID:0x19013a UUID:984265dc-4200-4f02-ae70-fe4f48964159>
+  # @example
+  #   UUID.md5_create(UUID_DNS_NAMESPACE, "www.widgets.com")
+  #   # => #<UUID:0x287576 UUID:3d813cbb-47fb-32ba-91df-831e1593ac29>
+  #   UUID.sha1_create(UUID_DNS_NAMESPACE, "www.widgets.com")
+  #   # => #<UUID:0x2a0116 UUID:21f7f8de-8051-5b89-8680-0195ef798b6a>
+  #   UUID.timestamp_create
+  #   # => #<UUID:0x2adfdc UUID:64a5189c-25b3-11da-a97b-00c04fd430c8>
+  #   UUID.random_create
+  #   # => #<UUID:0x19013a UUID:984265dc-4200-4f02-ae70-fe4f48964159>
   class UUID
     include Comparable
 
+    ##
+    # @api private
     @@last_timestamp = nil
+
+    ##
+    # @api private
     @@last_node_id = nil
+
+    ##
+    # @api private
     @@last_clock_sequence = nil
+
+    ##
+    # @api private
     @@state_file = nil
+
+    ##
+    # @api private
     @@mutex = Mutex.new
 
+    ##
+    # Creates a new UUID structure from its component values.
+    # @see UUID.md5_create
+    # @see UUID.sha1_create
+    # @see UUID.timestamp_create
+    # @see UUID.random_create
+    # @api private
     def initialize(time_low, time_mid, time_hi_and_version,
         clock_seq_hi_and_reserved, clock_seq_low, nodes)
       unless time_low >= 0 && time_low < 4294967296
@@ -110,13 +125,31 @@ module UUIDTools
       @nodes = nodes
     end
 
+    ##
+    # Returns the value of attribute `time_low`
     attr_accessor :time_low
+
+    ##
+    # Returns the value of attribute `time_mid`
     attr_accessor :time_mid
+
+    ##
+    # Returns the value of attribute `time_hi_and_version`
     attr_accessor :time_hi_and_version
+
+    ##
+    # Returns the value of attribute `clock_seq_hi_and_reserved`
     attr_accessor :clock_seq_hi_and_reserved
+
+    ##
+    # Returns the value of attribute `clock_seq_low`
     attr_accessor :clock_seq_low
+
+    ##
+    # Returns the value of attribute `nodes`
     attr_accessor :nodes
 
+    ##
     # Parses a UUID from a string.
     def self.parse(uuid_string)
       unless uuid_string.kind_of? String
@@ -140,6 +173,7 @@ module UUIDTools
         clock_seq_hi_and_reserved, clock_seq_low, nodes)
     end
 
+    ##
     # Parses a UUID from a raw byte string.
     def self.parse_raw(raw_string)
       unless raw_string.kind_of? String
@@ -161,6 +195,7 @@ module UUIDTools
         clock_seq_hi_and_reserved, clock_seq_low, nodes)
     end
 
+    ##
     # Parses a UUID from an Integer.
     def self.parse_int(uuid_int)
       unless uuid_int.kind_of?(Integer)
@@ -170,6 +205,7 @@ module UUIDTools
       return self.parse_raw(self.convert_int_to_byte_string(uuid_int, 16))
     end
 
+    ##
     # Parse a UUID from a hexdigest String.
     def self.parse_hexdigest(uuid_hexdigest)
       unless uuid_hexdigest.kind_of?(String)
@@ -179,6 +215,7 @@ module UUIDTools
       return self.parse_int(uuid_hexdigest.to_i(16))
     end
 
+    ##
     # Creates a UUID from a random value.
     def self.random_create()
       new_uuid = self.parse_raw(SecureRandom.random_bytes(16))
@@ -189,6 +226,7 @@ module UUIDTools
       return new_uuid
     end
 
+    ##
     # Creates a UUID from a timestamp.
     def self.timestamp_create(timestamp=nil)
       # We need a lock here to prevent two threads from ever
@@ -248,16 +286,19 @@ module UUIDTools
       end
     end
 
+    ##
     # Creates a UUID using the MD5 hash.  (Version 3)
     def self.md5_create(namespace, name)
       return self.create_from_hash(Digest::MD5, namespace, name)
     end
 
+    ##
     # Creates a UUID using the SHA1 hash.  (Version 5)
     def self.sha1_create(namespace, name)
       return self.create_from_hash(Digest::SHA1, namespace, name)
     end
 
+    ##
     # This method applies only to version 1 UUIDs.
     # Checks if the node ID was generated from a random number
     # or from an IEEE 802 address (MAC address).
@@ -269,6 +310,7 @@ module UUIDTools
       return ((self.nodes.first & 0x01) == 1)
     end
 
+    ##
     # Returns true if this UUID is the
     # nil UUID (00000000-0000-0000-0000-000000000000).
     def nil_uuid?
@@ -283,6 +325,7 @@ module UUIDTools
       return true
     end
 
+    ##
     # Returns the UUID version type.
     # Possible values:
     # 1 - Time-based with unique or random host identifier
@@ -294,6 +337,7 @@ module UUIDTools
       return (time_hi_and_version >> 12)
     end
 
+    ##
     # Returns the UUID variant.
     # Possible values:
     # 0b000 - Reserved, NCS backward compatibility.
@@ -313,6 +357,7 @@ module UUIDTools
       return (result >> 6)
     end
 
+    ##
     # Returns true if this UUID is valid.
     def valid?
       if [0b000, 0b100, 0b110, 0b111].include?(self.variant) &&
@@ -323,6 +368,7 @@ module UUIDTools
       end
     end
 
+    ##
     # Returns the IEEE 802 address used to generate this UUID or
     # nil if a MAC address was not used.
     def mac_address
@@ -333,6 +379,7 @@ module UUIDTools
       end).join(":")
     end
 
+    ##
     # Returns the timestamp used to generate this UUID
     def timestamp
       return nil if self.version != 1
@@ -345,6 +392,7 @@ module UUIDTools
         (gmt_timestamp_100_nanoseconds - 0x01B21DD213814000) / 10000000.0)
     end
 
+    ##
     # Compares two UUIDs lexically
     def <=>(other_uuid)
       check = self.time_low <=> other_uuid.time_low
@@ -369,56 +417,69 @@ module UUIDTools
       return 0
     end
 
+    ##
     # Returns a representation of the object's state
     def inspect
       return "#<UUID:0x#{self.object_id.to_s(16)} UUID:#{self.to_s}>"
     end
 
+    ##
     # Returns the hex digest of the UUID object.
     def hexdigest
       self.frozen? ? generate_hexdigest : (@hexdigest ||= generate_hexdigest)
     end
 
+    ##
     # Returns the raw bytes that represent this UUID.
     def raw
       self.frozen? ? generate_raw : (@raw ||= generate_raw)
     end
 
+    ##
     # Returns a string representation for this UUID.
     def to_s
       self.frozen? ? generate_s : (@string ||= generate_s)
     end
     alias_method :to_str, :to_s
 
+    ##
     # Returns an integer representation for this UUID.
     def to_i
       self.frozen? ? generate_i : (@integer ||= generate_i)
     end
 
+    ##
     # Returns a URI string for this UUID.
     def to_uri
       return "urn:uuid:#{self.to_s}"
     end
 
+    ##
     # Returns an integer hash value.
     def hash
       self.frozen? ? generate_hash : (@hash ||= generate_hash)
     end
 
-    #These methods generate the appropriate representations the above methods cache
-    protected
-    
+  protected
+    ##
     # Generates the hex digest of the UUID object.
+    #
+    # @api private
     def generate_hexdigest
       return self.to_i.to_s(16).rjust(32, "0")
     end
-    
+
     # Generates an integer hash value.
+    #
+    # @api private
     def generate_hash
       return self.to_i % 0x3fffffff
     end
-    
+
+    ##
     # Generates an integer representation for this UUID.
+    #
+    # @api private
     def generate_i
       return (begin
         bytes = (time_low << 96) + (time_mid << 80) +
@@ -430,8 +491,11 @@ module UUIDTools
         bytes
       end)
     end
-    
+
+    ##
     # Generates a string representation for this UUID.
+    #
+    # @api private
     def generate_s
       result = sprintf("%8.8x-%4.4x-%4.4x-%2.2x%2.2x-", @time_low, @time_mid,
         @time_hi_and_version, @clock_seq_hi_and_reserved, @clock_seq_low);
@@ -440,22 +504,26 @@ module UUIDTools
       end
       return result.downcase
     end
-    
+
+    ##
     # Generates the raw bytes that represent this UUID.
+    #
+    # @api private
     def generate_raw
       return self.class.convert_int_to_byte_string(self.to_i, 16)
     end
-    
-    public
 
+  public
+    ##
     # Returns true if this UUID is exactly equal to the other UUID.
     def eql?(other)
       return self == other
     end
 
+    ##
     # Returns the MAC address of the current computer's network card.
     # Returns nil if a MAC address could not be found.
-    def self.mac_address #:nodoc:
+    def self.mac_address
       if !defined?(@@mac_address)
         require 'rbconfig'
         os_platform = RbConfig::CONFIG['target_os']
@@ -582,6 +650,7 @@ module UUIDTools
       return @@mac_address
     end
 
+    ##
     # Allows users to set the MAC address manually in cases where the MAC
     # address cannot be obtained programatically.
     def self.mac_address=(new_mac_address)
@@ -591,8 +660,12 @@ module UUIDTools
     # The following methods are not part of the public API,
     # and generally should not be called directly.
 
+
+    ##
     # Creates a new UUID from a SHA1 or MD5 hash
-    def self.create_from_hash(hash_class, namespace, name) #:nodoc:
+    #
+    # @api private
+    def self.create_from_hash(hash_class, namespace, name)
       if hash_class == Digest::MD5
         version = 3
       elsif hash_class == Digest::SHA1
@@ -615,7 +688,9 @@ module UUIDTools
       return new_uuid
     end
 
-    def self.convert_int_to_byte_string(integer, size) #:nodoc:
+    ##
+    # @api private
+    def self.convert_int_to_byte_string(integer, size)
       byte_string = ""
       if byte_string.respond_to?(:force_encoding)
         byte_string.force_encoding(Encoding::ASCII_8BIT)
@@ -626,7 +701,9 @@ module UUIDTools
       return byte_string
     end
 
-    def self.convert_byte_string_to_int(byte_string) #:nodoc:
+    ##
+    # @api private
+    def self.convert_byte_string_to_int(byte_string)
       if byte_string.respond_to?(:force_encoding)
         byte_string.force_encoding(Encoding::ASCII_8BIT)
       end
@@ -641,8 +718,19 @@ module UUIDTools
     end
   end
 
+  ##
+  # Constant that represents the DNS namespace.
   UUID_DNS_NAMESPACE = UUID.parse("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
+
+  ##
+  # Constant that represents the URL namespace.
   UUID_URL_NAMESPACE = UUID.parse("6ba7b811-9dad-11d1-80b4-00c04fd430c8")
+
+  ##
+  # Constant that represents the OID namespace.
   UUID_OID_NAMESPACE = UUID.parse("6ba7b812-9dad-11d1-80b4-00c04fd430c8")
+
+  ##
+  # Constant that represents the X500 namespace.
   UUID_X500_NAMESPACE = UUID.parse("6ba7b814-9dad-11d1-80b4-00c04fd430c8")
 end

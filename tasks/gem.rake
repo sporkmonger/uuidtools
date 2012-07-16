@@ -1,12 +1,11 @@
-require "rake/gempackagetask"
+require "rubygems/package_task"
+require "rake"
+require "rake/clean"
+
+CLOBBER.include("pkg")
 
 namespace :gem do
   GEM_SPEC = Gem::Specification.new do |s|
-    unless s.respond_to?(:add_development_dependency)
-      puts "The gem spec requires a newer version of RubyGems."
-      exit(1)
-    end
-
     s.name = PKG_NAME
     s.version = PKG_VERSION
     s.summary = PKG_SUMMARY
@@ -15,25 +14,46 @@ namespace :gem do
     s.files = PKG_FILES.to_a
 
     s.has_rdoc = true
-    s.extra_rdoc_files = %w( README )
-    s.rdoc_options.concat ["--main",  "README"]
+    s.extra_rdoc_files = %w( README.md )
+    s.rdoc_options.concat ["--main",  "README.md"]
 
-    s.add_development_dependency("rake", ">= 0.8.3")
-    s.add_development_dependency("rspec", ">= 1.1.11")
-    s.add_development_dependency("launchy", ">= 0.3.2")
+    if !s.respond_to?(:add_development_dependency)
+      puts "Cannot build Gem with this version of RubyGems."
+      exit(1)
+    end
+
+    s.add_development_dependency("rake", ">= 0.7.3")
+    s.add_development_dependency("rspec", ">= 2.9.0")
+    s.add_development_dependency("yard", ">= 0.8.2")
+    s.add_development_dependency("launchy", ">= 2.0.0")
 
     s.require_path = "lib"
 
     s.author = "Bob Aman"
     s.email = "bob@sporkmonger.com"
-    s.homepage = "http://#{PKG_NAME}.rubyforge.org/"
+    s.homepage = RUBY_FORGE_URL
     s.rubyforge_project = RUBY_FORGE_PROJECT
   end
 
-  Rake::GemPackageTask.new(GEM_SPEC) do |p|
+  Gem::PackageTask.new(GEM_SPEC) do |p|
     p.gem_spec = GEM_SPEC
     p.need_tar = true
     p.need_zip = true
+  end
+
+  desc "Generates .gemspec file"
+  task :gemspec do
+    spec_string = GEM_SPEC.to_ruby
+
+    begin
+      Thread.new { eval("$SAFE = 3\n#{spec_string}", binding) }.join
+    rescue
+      abort "unsafe gemspec: #{$!}"
+    else
+      File.open("#{GEM_SPEC.name}.gemspec", 'w') do |file|
+        file.write spec_string
+      end
+    end
   end
 
   desc "Show information about the gem"
@@ -65,4 +85,4 @@ end
 desc "Alias to gem:package"
 task "gem" => "gem:package"
 
-task "clobber" => ["gem:clobber_package"]
+task "gem:release" => "gem:gemspec"

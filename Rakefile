@@ -1,16 +1,7 @@
-lib_dir = File.expand_path(File.join(File.dirname(__FILE__), "lib"))
-$:.unshift(lib_dir)
-$:.uniq!
-
 require 'rubygems'
 require 'rake'
-require 'rake/testtask'
-require 'rake/rdoctask'
-require 'rake/packagetask'
-require 'rake/gempackagetask'
-require 'spec/rake/spectask'
 
-require File.join(File.dirname(__FILE__), 'lib/uuidtools', 'version')
+require File.join(File.dirname(__FILE__), 'lib', 'uuidtools', 'version')
 
 PKG_DISPLAY_NAME   = 'UUIDTools'
 PKG_NAME           = PKG_DISPLAY_NAME.downcase
@@ -35,12 +26,7 @@ PKG_FILES = FileList[
     "[A-Z]*", "Rakefile"
 ].exclude(/database\.yml/).exclude(/[_\.]git$/)
 
-RCOV_ENABLED = (RUBY_PLATFORM != "java" && RUBY_VERSION =~ /^1\.8/)
-if RCOV_ENABLED
-  task :default => "spec:verify"
-else
-  task :default => "spec"
-end
+task :default => "spec"
 
 WINDOWS = (RUBY_PLATFORM =~ /mswin|win32|mingw|bccwin|cygwin/) rescue false
 SUDO = WINDOWS ? '' : ('sudo' unless ENV['SUDOLESS'])

@@ -1,4 +1,9 @@
+.DS_Store
+.yardoc
+.bundle
+Gemfile.lock
 coverage
 doc
-specdoc
+heckling
 pkg
+specdoc
