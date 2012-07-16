@@ -13,7 +13,6 @@ namespace :gem do
 
     s.files = PKG_FILES.to_a
 
-    s.has_rdoc = true
     s.extra_rdoc_files = %w( README.md )
     s.rdoc_options.concat ["--main",  "README.md"]
 
@@ -32,7 +31,6 @@ namespace :gem do
     s.author = "Bob Aman"
     s.email = "bob@sporkmonger.com"
     s.homepage = RUBY_FORGE_URL
-    s.rubyforge_project = RUBY_FORGE_PROJECT
   end
 
   Gem::PackageTask.new(GEM_SPEC) do |p|
