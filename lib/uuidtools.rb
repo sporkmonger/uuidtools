@@ -426,19 +426,21 @@ module UUIDTools
     ##
     # Returns the hex digest of the UUID object.
     def hexdigest
-      self.frozen? ? generate_hexdigest : (@hexdigest ||= generate_hexdigest)
+      (self.frozen? ?
+        generate_hexdigest : (@hexdigest ||= generate_hexdigest)
+      ).dup
     end
 
     ##
     # Returns the raw bytes that represent this UUID.
     def raw
-      self.frozen? ? generate_raw : (@raw ||= generate_raw)
+      (self.frozen? ? generate_raw : (@raw ||= generate_raw)).dup
     end
 
     ##
     # Returns a string representation for this UUID.
     def to_s
-      self.frozen? ? generate_s : (@string ||= generate_s)
+      (self.frozen? ? generate_s : (@string ||= generate_s)).dup
     end
     alias_method :to_str, :to_s
 
