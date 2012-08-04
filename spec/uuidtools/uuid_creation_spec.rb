@@ -44,6 +44,13 @@ describe UUIDTools::UUID, "when generating" do
     (uuids.map {|x| x.to_s}).uniq.size.should == uuids.size
   end
 
+  it "should not have internal state used in string representations" do
+    uuid = UUIDTools::UUID.random_create
+    uuid_string = uuid.to_s.dup
+    uuid.to_s.gsub!("-", "/")
+    uuid.to_s.should == uuid_string
+  end
+
   it "should throw an exception if a segment has an invalid value" do
     (lambda do
       UUIDTools::UUID.new(-1, 0, 0, 0, 0, [0, 0, 0, 0, 0, 0])
