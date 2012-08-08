@@ -24,7 +24,7 @@ PKG_FILES = FileList[
     "lib/**/*", "spec/**/*", "vendor/**/*",
     "tasks/**/*", "website/**/*",
     "[A-Z]*", "Rakefile"
-].exclude(/database\.yml/).exclude(/[_\.]git$/)
+].exclude(/database\.yml/).exclude(/[_\.]git$/).exclude(/Gemfile/).exclude(/Gemfile\.lock/)
 
 task :default => "spec"
 

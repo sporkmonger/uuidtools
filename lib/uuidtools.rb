@@ -556,7 +556,7 @@ module UUIDTools
         if os_class == :windows
           script_in_path = true
         else
-          script_in_path = Kernel.system("which ifconfig 2>&1 > /dev/null")
+          script_in_path = Kernel.system("which ifconfig 2&>1 > /dev/null")
         end
         if os_class == :solaris
           begin
