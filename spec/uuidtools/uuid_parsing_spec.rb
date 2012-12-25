@@ -124,4 +124,9 @@ describe UUIDTools::UUID, "when parsing" do
     uuid = UUIDTools::UUID.timestamp_create
     UUIDTools::UUID.parse_hexdigest(uuid.hexdigest).should == uuid
   end
+
+  it "should correctly parse URIs" do
+    uuid = UUIDTools::UUID.timestamp_create
+    UUIDTools::UUID.parse_uri(uuid.to_uri).should == uuid
+  end
 end

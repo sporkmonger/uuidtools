@@ -216,6 +216,16 @@ module UUIDTools
     end
 
     ##
+    # Parse a UUID from a URI String.
+    def self.parse_uri(uuid_uri)
+      unless uuid_uri.kind_of?(String)
+        raise ArgumentError,
+              "Expected String, got #{uuid_uri.class.name} instead."
+      end
+      return self.parse(uuid_uri.sub(UUID_URN_PREFIX,''))
+    end
+
+    ##
     # Creates a UUID from a random value.
     def self.random_create()
       new_uuid = self.parse_raw(SecureRandom.random_bytes(16))
@@ -453,7 +463,7 @@ module UUIDTools
     ##
     # Returns a URI string for this UUID.
     def to_uri
-      return "urn:uuid:#{self.to_s}"
+      return UUID_URN_PREFIX + self.to_s
     end
 
     ##
@@ -735,4 +745,8 @@ module UUIDTools
   ##
   # Constant that represents the X500 namespace.
   UUID_X500_NAMESPACE = UUID.parse("6ba7b814-9dad-11d1-80b4-00c04fd430c8")
+
+  ##
+  # Constant that represents the URI prefix according to RFC 4122.
+  UUID_URN_PREFIX = 'urn:uuid:'
 end
