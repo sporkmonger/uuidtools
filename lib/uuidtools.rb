@@ -522,116 +522,114 @@ module UUIDTools
       return self == other
     end
 
+    #
+    # Determine what OS we're running on.  Helps decide how to find the MAC
+    #
+    def self.os_class
+      require 'rbconfig'
+      os_platform = RbConfig::CONFIG['target_os']
+      os_class = nil
+      if (os_platform =~ /win/i && !(os_platform =~ /darwin/i)) ||
+          os_platform =~ /w32/i
+        os_class = :windows
+      elsif os_platform =~ /solaris/i
+        os_class = :solaris
+      elsif os_platform =~ /netbsd/i
+        os_class = :netbsd
+      elsif os_platform =~ /openbsd/i
+        os_class = :openbsd
+      end
+    end
+
+    # making these class variables helps with testing
+    @ifconfig_command = "ifconfig"
+    @ifconfig_path_default = "/sbin/ifconfig"
+    @ip_command = "ip"
+    @ip_path_default = "/sbin/ip"
+
+    class << self
+      attr_accessor :ifconfig_command, :ifconfig_path_default
+      attr_accessor :ip_command, :ip_path_default
+    end
+
+    #
+    # Find the path of the ifconfig(8) command if it is present
+    # 
+    def self.ifconfig_path
+      path = `which #{UUID.ifconfig_command} 2>/dev/null`.strip
+      path = UUID.ifconfig_path_default if (path == "" && File.exist?(UUID.ifconfig_path_default))
+      return (path === "" ? nil : path)
+    end
+
+    #
+    # Find the path of the ip(8) command if it is present
+    #
+    def self.ip_path
+      path = `which #{UUID.ip_command} 2>/dev/null`.strip
+      path = UUID.ip_path_default if (path == "" && File.exist?(UUID.ip_path_default))
+      return (path === "" ? nil : path)
+    end
+
+    #
+    # Call the ifconfig or ip command that is found
+    #
+    def self.ifconfig(all=nil)
+      # find the path of the ifconfig command
+      ifconfig_path = UUID.ifconfig_path
+
+      # if it does not exist, try the ip command
+      if ifconfig_path == nil
+        ifconfig_path = UUID.ip_path
+        # all makes no sense when using ip(1)
+        all = nil
+      end
+
+      all_switch = all == nil ? "" : "-a"
+      return `#{ifconfig_path} #{all_switch}` if not ifconfig_path == nil
+    end
+
+    # Match and return the first Mac address found
+    def self.first_mac(instring)
+      mac_regexps = [
+        Regexp.new("address:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
+        Regexp.new("addr:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
+        Regexp.new("ether:? (#{(["[0-9a-fA-F]{1,2}"] * 6).join(":")})"),
+        Regexp.new("HWaddr:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
+        Regexp.new("link/ether? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
+        Regexp.new("(#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
+        Regexp.new("(#{(["[0-9a-fA-F]{2}"] * 6).join("-")})")
+      ]
+      parse_mac = lambda do |output|
+        (mac_regexps.map do |regexp|
+           result = output[regexp, 1]
+           result.downcase.gsub(/-/, ":") if result != nil
+        end).compact.first
+      end
+
+      mac = parse_mac.call(instring)
+      # expand octets that were compressed (solaris)
+      mac.split(':').map { |c| (c.length == 1 ? "0#{c}" : c)}.join(':')
+
+    end
+
     ##
     # Returns the MAC address of the current computer's network card.
     # Returns nil if a MAC address could not be found.
     def self.mac_address
       if !defined?(@@mac_address)
         require 'rbconfig'
-        os_platform = RbConfig::CONFIG['target_os']
-        os_class = nil
-        if (os_platform =~ /win/i && !(os_platform =~ /darwin/i)) ||
-            os_platform =~ /w32/i
-          os_class = :windows
-        elsif os_platform =~ /solaris/i
-          os_class = :solaris
-        elsif os_platform =~ /netbsd/i
-          os_class = :netbsd
-        elsif os_platform =~ /openbsd/i
-          os_class = :openbsd
-        end
-        mac_regexps = [
-          Regexp.new("address:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
-          Regexp.new("addr:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
-          Regexp.new("ether:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
-          Regexp.new("(#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
-          Regexp.new("(#{(["[0-9a-fA-F]{2}"] * 6).join("-")})")
-        ]
-        parse_mac = lambda do |output|
-          (mac_regexps.map do |regexp|
-            result = output[regexp, 1]
-            result.downcase.gsub(/-/, ":") if result != nil
-          end).compact.first
-        end
+        
+        os_class = UUID.os_class
+
         if os_class == :windows
-          script_in_path = true
-        else
-          script_in_path = Kernel.system("which ifconfig >/dev/null 2>&1")
-        end
-        if os_class == :solaris
           begin
-            ifconfig_output =
-              (script_in_path ? `ifconfig -a` : `/sbin/ifconfig -a`)
-            ip_addresses = ifconfig_output.scan(
-              /inet\s?(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/)
-            ip = ip_addresses.find {|addr| addr[0] != '127.0.0.1'}[0]
-            @@mac_address = `/usr/sbin/arp #{ip}`.split(' ')[3]
-          rescue Exception
-          end
-          if @@mac_address == "" || @@mac_address == nil
-            begin
-              ifconfig_output =
-                (script_in_path ?
-                  `ifconfig -a` : `/sbin/ifconfig -a`).split(' ')
-              index = ifconfig_output.index("inet") + 1
-              ip = ifconfig_output[index]
-              @@mac_address = `arp #{ip}`.split(' ')[3]
-            rescue Exception
-            end
-          end
-        elsif os_class == :windows
-          begin
-            @@mac_address = parse_mac.call(`ipconfig /all`)
+            @@mac_address = UUID.first_mac `ipconfig /all`
           rescue
           end
-        else
-          begin
-            if os_class == :netbsd
-              @@mac_address = parse_mac.call(
-                script_in_path ? `ifconfig -a 2>&1` : `/sbin/ifconfig -a 2>&1`
-              )
-            elsif os_class == :openbsd
-              @@mac_address = parse_mac.call(
-                script_in_path ? `ifconfig -a 2>&1` : `/sbin/ifconfig -a 2>&1`
-              )
-            elsif File.exists?('/sbin/ifconfig')
-              @@mac_address = parse_mac.call(
-                script_in_path ? `ifconfig 2>&1` : `/sbin/ifconfig 2>&1`
-              )
-              if @@mac_address == nil
-                @@mac_address = parse_mac.call(
-                  script_in_path ?
-                    `ifconfig -a 2>&1` : `/sbin/ifconfig -a 2>&1`
-                )
-              end
-              if @@mac_address == nil
-                @@mac_address = parse_mac.call(
-                  script_in_path ?
-                    `ifconfig | grep HWaddr | cut -c39- 2>&1` :
-                    `/sbin/ifconfig | grep HWaddr | cut -c39- 2>&1`
-                )
-              end
-            else
-              @@mac_address = parse_mac.call(
-                script_in_path ? `ifconfig 2>&1` : `/sbin/ifconfig 2>&1`
-              )
-              if @@mac_address == nil
-                @@mac_address = parse_mac.call(
-                  script_in_path ?
-                    `ifconfig -a 2>&1` : `/sbin/ifconfig -a 2>&1`
-                )
-              end
-              if @@mac_address == nil
-                @@mac_address = parse_mac.call(
-                  script_in_path ?
-                    `ifconfig | grep HWaddr | cut -c39- 2>&1` :
-                    `/sbin/ifconfig | grep HWaddr | cut -c39- 2>&1`
-                )
-              end
-            end
-          rescue
-          end
+        else # linux, bsd, macos, solaris
+          @@mac_address = UUID.first_mac(UUID.ifconfig(:all))
         end
+
         if @@mac_address != nil
           if @@mac_address.respond_to?(:to_str)
             @@mac_address = @@mac_address.to_str
