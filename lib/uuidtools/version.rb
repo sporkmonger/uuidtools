@@ -22,7 +22,7 @@ unless defined? UUIDTools::VERSION
     module VERSION #:nodoc:
       MAJOR = 2
       MINOR = 1
-      TINY  = 3
+      TINY  = 4
 
       STRING = [MAJOR, MINOR, TINY].join('.')
     end
