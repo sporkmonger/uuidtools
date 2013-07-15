@@ -554,7 +554,7 @@ module UUIDTools
 
     #
     # Find the path of the ifconfig(8) command if it is present
-    # 
+    #
     def self.ifconfig_path
       path = `which #{UUID.ifconfig_command} 2>/dev/null`.strip
       path = UUID.ifconfig_path_default if (path == "" && File.exist?(UUID.ifconfig_path_default))
@@ -618,7 +618,7 @@ module UUIDTools
     def self.mac_address
       if !defined?(@@mac_address)
         require 'rbconfig'
-        
+
         os_class = UUID.os_class
 
         if os_class == :windows
