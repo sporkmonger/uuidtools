@@ -607,9 +607,14 @@ module UUIDTools
       end
 
       mac = parse_mac.call(instring)
-      # expand octets that were compressed (solaris)
-      mac.split(':').map { |c| (c.length == 1 ? "0#{c}" : c)}.join(':')
-
+      if mac
+        # expand octets that were compressed (solaris)
+        return (mac.split(':').map do |octet|
+          (octet.length == 1 ? "0#{octet}" : octet)
+        end).join(':')
+      else
+        return nil
+      end
     end
 
     ##
