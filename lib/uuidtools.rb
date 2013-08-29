@@ -567,7 +567,7 @@ module UUIDTools
     def self.ip_path
       path = `which #{UUID.ip_command} 2>/dev/null`.strip
       path = UUID.ip_path_default if (path == "" && File.exist?(UUID.ip_path_default))
-      return (path === "" ? nil : path)
+      return (path === "" ? nil : "#{path} addr list")
     end
 
     #
