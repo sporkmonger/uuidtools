@@ -579,7 +579,7 @@ module UUIDTools
 
       # if it does not exist, try the ip command
       if ifconfig_path == nil
-        ifconfig_path = UUID.ip_path
+        ifconfig_path = "#{UUID.ip_path} addr list"
         # all makes no sense when using ip(1)
         all = nil
       end
