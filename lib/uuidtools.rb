@@ -519,6 +519,13 @@ module UUIDTools
     def eql?(other)
       return self == other
     end
+    
+    ##
+    # Returns true if the string value has the general format of a UUID.
+    # Does not validate the UUID at all.
+    def self.is_uuid?(str)
+      !!(str =~ UUIDTools::UUID_REGEXP)
+    end
 
     #
     # Determine what OS we're running on.  Helps decide how to find the MAC
