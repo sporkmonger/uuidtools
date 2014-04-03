@@ -598,8 +598,14 @@ module UUIDTools
         Regexp.new("(#{(["[0-9a-fA-F]{2}"] * 6).join("-")})")
       ]
       parse_mac = lambda do |output|
+        ascii_output = output.encode(Encoding.find('ASCII'), {
+            :invalid           => :replace,  # Replace invalid byte sequences
+            :undef             => :replace,  # Replace anything not defined in ASCII
+            :replace           => '',        # Use a blank for those replacements
+            :universal_newline => true       # Always break lines with \n
+        })
         (mac_regexps.map do |regexp|
-           result = output[regexp, 1]
+           result = ascii_output[regexp, 1]
            result.downcase.gsub(/-/, ":") if result != nil
         end).compact.first
       end
