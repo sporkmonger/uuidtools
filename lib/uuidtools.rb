@@ -156,9 +156,7 @@ module UUIDTools
         raise TypeError,
           "Expected String, got #{uuid_string.class.name} instead."
       end
-      uuid_components = uuid_string.downcase.scan(
-        Regexp.new("^([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-" +
-          "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})$")).first
+      uuid_components = uuid_string.downcase.scan(UUIDTools::UUID_REGEXP).first
       raise ArgumentError, "Invalid UUID format." if uuid_components.nil?
       time_low = uuid_components[0].to_i(16)
       time_mid = uuid_components[1].to_i(16)
@@ -579,7 +577,7 @@ module UUIDTools
 
       # if it does not exist, try the ip command
       if ifconfig_path == nil
-        ifconfig_path = UUID.ip_path
+        ifconfig_path = "#{UUID.ip_path} addr list"
         # all makes no sense when using ip(1)
         all = nil
       end
@@ -722,6 +720,11 @@ module UUIDTools
       return integer
     end
   end
+  
+  ##
+  # Constant Regexp that matches a UUID and captures its components.
+  UUID_REGEXP = Regexp.new("^([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-" +
+                          "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})$")
 
   ##
   # Constant that represents the DNS namespace.
