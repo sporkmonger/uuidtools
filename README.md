@@ -1,9 +1,9 @@
 # UUIDTools
 
 <dl>
-  <dt>Homepage</dt><dd><a href="http://uuidtools.rubyforge.org/">uuidtools.rubyforge.org</a></dd>
+  <dt>Homepage</dt><dd><a href="https://github.com/sporkmonger/uuidtools">sporkmonger/uuidtools</a></dd>
   <dt>Author</dt><dd><a href="mailto:bob@sporkmonger.com">Bob Aman</a></dd>
-  <dt>Copyright</dt><dd>Copyright © 2005-2012 Bob Aman</dd>
+  <dt>Copyright</dt><dd>Copyright © 2005-2014 Bob Aman</dd>
   <dt>License</dt><dd>Apache 2.0</dd>
 </dl>
 

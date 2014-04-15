@@ -28,9 +28,9 @@ namespace :gem do
 
     s.require_path = "lib"
 
-    s.author = "Bob Aman"
-    s.email = "bob@sporkmonger.com"
-    s.homepage = RUBY_FORGE_URL
+    s.author = PKG_AUTHOR
+    s.email = PKG_AUTHOR_EMAIL
+    s.homepage = PKG_HOMEPAGE
   end
 
   Gem::PackageTask.new(GEM_SPEC) do |p|

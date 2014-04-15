@@ -10,11 +10,12 @@ PKG_FILE_NAME      = "#{PKG_NAME}-#{PKG_VERSION}"
 
 RELEASE_NAME       = "REL #{PKG_VERSION}"
 
-RUBY_FORGE_PROJECT = PKG_NAME
-RUBY_FORGE_USER    = "sporkmonger"
-RUBY_FORGE_PATH    = "/var/www/gforge-projects/#{RUBY_FORGE_PROJECT}"
-RUBY_FORGE_URL     = "http://#{RUBY_FORGE_PROJECT}.rubyforge.org/"
+GIT_HUB_USER       = "sporkmonger"
+GIT_HUB_URL        = "https://github.com/#{GIT_HUB_USER}/#{PKG_NAME}"
 
+PKG_AUTHOR         = "Bob Aman"
+PKG_AUTHOR_EMAIL   = "bob@sporkmonger.com"
+PKG_HOMEPAGE       = GIT_HUB_URL
 PKG_SUMMARY        = "UUID generator"
 PKG_DESCRIPTION    = <<-TEXT
 A simple universally unique ID generation library.
