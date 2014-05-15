@@ -9,6 +9,7 @@
 
 [![Build Status](https://secure.travis-ci.org/sporkmonger/uuidtools.png)](http://travis-ci.org/sporkmonger/uuidtools)
 [![Dependency Status](https://gemnasium.com/sporkmonger/uuidtools.png)](https://gemnasium.com/sporkmonger/uuidtools)
+[![Gittip Donate](http://img.shields.io/gittip/sporkmonger.png)](https://www.gittip.com/sporkmonger/ "Support Open Source Development w/ Gittip")
 
 # Description
 
