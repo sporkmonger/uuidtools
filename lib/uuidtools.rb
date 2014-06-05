@@ -393,6 +393,7 @@ module UUIDTools
     ##
     # Compares two UUIDs lexically
     def <=>(other_uuid)
+      return nil unless other_uuid.is_a?(UUIDTools::UUID)
       check = self.time_low <=> other_uuid.time_low
       return check if check != 0
       check = self.time_mid <=> other_uuid.time_mid
