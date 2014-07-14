@@ -107,6 +107,12 @@ describe UUIDTools::UUID, "when parsing" do
     )
   end
 
+  it "should return the correct value for #is_uuid?" do
+    uuid = UUIDTools::UUID.random_create.to_s
+    UUIDTools::UUID.is_uuid?(uuid).should eql(true)
+    UUIDTools::UUID.is_uuid?("string").should eql(false)
+  end
+
   it "should correctly parse integers" do
     UUIDTools::UUID.new(0, 0, 0, 0, 0, [0, 0, 0, 0, 0, 0]).should ==
       UUIDTools::UUID.parse_int(0)
