@@ -721,7 +721,7 @@ module UUIDTools
       return integer
     end
   end
-  
+
   ##
   # Constant Regexp that matches a UUID and captures its components.
   UUID_REGEXP = Regexp.new("^([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-" +

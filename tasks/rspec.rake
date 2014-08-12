@@ -8,7 +8,6 @@ namespace :spec do
     t.pattern = FileList['spec/**/*_spec.rb']
     t.rspec_opts = ['--color', '--format', 'documentation']
 
-    t.rcov = true
     t.rcov_opts = [
       '--exclude', 'lib\\/compat',
       '--exclude', 'spec',
@@ -23,13 +22,11 @@ namespace :spec do
   RSpec::Core::RakeTask.new(:normal) do |t|
     t.pattern = FileList['spec/**/*_spec.rb'].exclude(/compat/)
     t.rspec_opts = ['--color', '--format', 'documentation']
-    t.rcov = false
   end
 
   RSpec::Core::RakeTask.new(:all) do |t|
     t.pattern = FileList['spec/**/*_spec.rb']
     t.rspec_opts = ['--color', '--format', 'documentation']
-    t.rcov = false
   end
 
   desc "Generate HTML Specdocs for all specs"
