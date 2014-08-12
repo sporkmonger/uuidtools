@@ -1,14 +1,14 @@
 # -*- encoding: utf-8 -*-
-# stub: uuidtools 2.1.4 ruby lib
+# stub: uuidtools 2.1.5 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "uuidtools"
-  s.version = "2.1.4"
+  s.version = "2.1.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Bob Aman"]
-  s.date = "2014-04-15"
+  s.date = "2014-08-12"
   s.description = "A simple universally unique ID generation library.\n"
   s.email = "bob@sporkmonger.com"
   s.extra_rdoc_files = ["README.md"]

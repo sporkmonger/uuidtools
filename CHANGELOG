@@ -1,3 +1,7 @@
+== UUIDTools 2.1.5
+ * fixed issue with ip command vs ifconfig
+ * dumped RubyForge related cruft
+ * updated to modern RSpec syntax
 == UUIDTools 2.1.4
  * various OS-specific improvements to obtaining MAC address
 == UUIDTools 2.1.3
