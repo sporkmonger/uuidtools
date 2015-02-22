@@ -8,8 +8,10 @@ rvm:
   - jruby
   - jruby-head
   - ree
+  - rbx-2
 matrix:
   allow_failures:
     - rvm: ruby-head
     - rvm: jruby-head
+    - rvm: rbx-2
 script: "bundle exec rake"
