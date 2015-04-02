@@ -511,7 +511,7 @@ module UUIDTools
     #
     # @api private
     def generate_raw
-      return self.class.convert_int_to_byte_string(self.to_i, 16)
+      return self.class.convert_int_to_byte_string(self.sto_i, 16)
     end
 
   public
@@ -629,6 +629,7 @@ module UUIDTools
           begin
             @@mac_address = UUID.first_mac `ipconfig /all`
           rescue
+            @@mac_address = nil          
           end
         else # linux, bsd, macos, solaris
           @@mac_address = UUID.first_mac(UUID.ifconfig(:all))
