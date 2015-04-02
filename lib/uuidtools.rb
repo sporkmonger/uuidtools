@@ -629,6 +629,7 @@ module UUIDTools
           begin
             @@mac_address = UUID.first_mac `ipconfig /all`
           rescue
+            @@mac_address = nil
           end
         else # linux, bsd, macos, solaris
           @@mac_address = UUID.first_mac(UUID.ifconfig(:all))
