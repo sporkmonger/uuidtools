@@ -10,7 +10,7 @@ task :benchmark do
     $stdout.puts "#{format_float(iterations / result.real)} | #{action}"
   end
 
-  def benchmark(name, n: 10000)
+  def benchmark(name, n = 10000)
     result = Benchmark.measure do
       n.times { yield }
     end
@@ -34,16 +34,16 @@ task :benchmark do
   ## 
   # Benchmark UUID parsing
   uuid_s = UUIDTools::UUID.random_create.to_s
-  benchmark('UUID::parse', n: 40000) { UUIDTools::UUID.parse(uuid_s) }
+  benchmark('UUID::parse', 40000) { UUIDTools::UUID.parse(uuid_s) }
 
   uuid_raw = UUIDTools::UUID.random_create.raw
-  benchmark('UUID::parse_raw', n: 40000) { UUIDTools::UUID.parse_raw(uuid_raw) }
+  benchmark('UUID::parse_raw', 40000) { UUIDTools::UUID.parse_raw(uuid_raw) }
 
   uuid_i = UUIDTools::UUID.random_create.to_i
-  benchmark('UUID::parse_int', n: 40000) { UUIDTools::UUID.parse_int(uuid_i) }
+  benchmark('UUID::parse_int', 40000) { UUIDTools::UUID.parse_int(uuid_i) }
 
   uuid_hex = UUIDTools::UUID.random_create.hexdigest
-  benchmark('UUID::parse_hexdigest', n: 40000) { UUIDTools::UUID.parse_hexdigest(uuid_hex) }
+  benchmark('UUID::parse_hexdigest', 40000) { UUIDTools::UUID.parse_hexdigest(uuid_hex) }
 
   ##
   # Benchmark UUID private api
