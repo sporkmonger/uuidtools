@@ -1,6 +1,10 @@
 task :benchmark do
   require 'benchmark'
-  require_relative '../lib/uuidtools'
+  if Kernel.method_defined? :require_relative
+    require_relative '../lib/uuidtools'
+  else
+    require 'lib/uuidtools'
+  end
 
   def format_float(float)
     ("%.2f" % float).rjust(9, ' ')
