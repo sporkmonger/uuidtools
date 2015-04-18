@@ -1,10 +1,8 @@
 task :benchmark do
   require 'benchmark'
-  if Kernel.method_defined? :require_relative
-    require_relative '../lib/uuidtools'
-  else
-    require 'lib/uuidtools'
-  end
+
+  $LOAD_PATH.unshift File.expand_path('../..', __FILE__)
+  require 'lib/uuidtools'
 
   def format_float(float)
     ("%.2f" % float).rjust(9, ' ')
