@@ -192,18 +192,29 @@ module UUIDTools
         raw_string.rjust(16, "\0")
       end
 
-      raw_bytes = (raw_string[0].respond_to? :ord) ? raw_string.chars.map(&:ord) : raw_string
-      time_low = ((raw_bytes[0] << 12) +
-                  (raw_bytes[1] << 8)  +
-                  (raw_bytes[2] << 4)  +
+      raw_bytes = []
+      if raw_string[0].respond_to? :ord
+        for i in 0...raw_string.size
+          raw_bytes << raw_string[i].ord
+        end
+      else
+        raw_bytes = raw_string
+      end
+
+      time_low = ((raw_bytes[0] << 24) +
+                  (raw_bytes[1] << 16)  +
+                  (raw_bytes[2] << 8)  +
                    raw_bytes[3])
-      time_mid = ((raw_bytes[4] << 4) +
+      time_mid = ((raw_bytes[4] << 8) +
                    raw_bytes[5])
-      time_hi_and_version = ((raw_bytes[6] << 4) +
+      time_hi_and_version = ((raw_bytes[6] << 8) +
                               raw_bytes[7])
       clock_seq_hi_and_reserved = raw_bytes[8]
       clock_seq_low = raw_bytes[9]
-      nodes = raw_bytes[10...16]
+      nodes = []
+      for i in 10...16
+        nodes << raw_bytes[i]
+      end
 
       return self.new(time_low, time_mid, time_hi_and_version,
                       clock_seq_hi_and_reserved, clock_seq_low, nodes)
@@ -755,7 +766,7 @@ module UUIDTools
 
       integer = 0
       size = byte_string.size
-      if byte_string[0].respond_to?(:ord)
+      if byte_string[0].respond_to? :ord
         for i in 0...size
           integer += (byte_string[i].ord << (((size - 1) - i) * 8))
         end
