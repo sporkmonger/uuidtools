@@ -183,13 +183,19 @@ module UUIDTools
         raw_string.force_encoding(Encoding::ASCII_8BIT)
       end
 
-      unless raw_string.length == 16
+      raw_length = raw_string.length
+      if raw_length < 16
         # Option A: Enforce raw_string be 16 characters (More strict)
         #raise ArgumentError,
         #  "Expected 16 bytes, got #{raw_string.length} instead."
 
         # Option B: Pad raw_string to 16 characters (Compatible with existing behavior)
-        raw_string.rjust(16, "\0")
+        raw_string = raw_string.rjust(16, "\0")
+      elsif raw_length > 16
+        # NOTE: As per "Option B" above, existing behavior would use the lower
+        # 128-bits of an overly long raw_string instead of using the upper 128-bits.
+        start_index = raw_length - 16
+        raw_string = raw_string[start_index...raw_length]
       end
 
       raw_bytes = []
