@@ -164,7 +164,7 @@ module UUIDTools
       clock_seq_hi_and_reserved = uuid_components[3].to_i(16)
       clock_seq_low = uuid_components[4].to_i(16)
       nodes = []
-      for i in 0..5
+      6.times do |i|
         nodes << uuid_components[5][(i * 2)..(i * 2) + 1].to_i(16)
       end
       return self.new(time_low, time_mid, time_hi_and_version,
@@ -186,7 +186,7 @@ module UUIDTools
       clock_seq_hi_and_reserved = (integer >> 56) & 0xFF
       clock_seq_low = (integer >> 48) & 0xFF
       nodes = []
-      for i in 0..5
+      6.times do |i|
         nodes << ((integer >> (40 - (i * 8))) & 0xFF)
       end
       return self.new(time_low, time_mid, time_hi_and_version,
@@ -249,7 +249,7 @@ module UUIDTools
           nodes = SecureRandom.random_bytes(6).unpack("C*")
           nodes[0] |= 0b00000001
         end
-        for i in 0..5
+        6.times do |i|
           node_id += (nodes[i] << (40 - (i * 8)))
         end
         clock_sequence = @@last_clock_sequence
@@ -405,7 +405,7 @@ module UUIDTools
       return check if check != 0
       check = self.clock_seq_low <=> other_uuid.clock_seq_low
       return check if check != 0
-      for i in 0..5
+      6.times do |i|
         if (self.nodes[i] < other_uuid.nodes[i])
           return -1
         end
@@ -486,7 +486,7 @@ module UUIDTools
         bytes = (time_low << 96) + (time_mid << 80) +
           (time_hi_and_version << 64) + (clock_seq_hi_and_reserved << 56) +
           (clock_seq_low << 48)
-        for i in 0..5
+        6.times do |i|
           bytes += (nodes[i] << (40 - (i * 8)))
         end
         bytes
@@ -500,7 +500,7 @@ module UUIDTools
     def generate_s
       result = sprintf("%8.8x-%4.4x-%4.4x-%2.2x%2.2x-", @time_low, @time_mid,
         @time_hi_and_version, @clock_seq_hi_and_reserved, @clock_seq_low);
-      for i in 0..5
+      6.times do |i|
         result << sprintf("%2.2x", @nodes[i])
       end
       return result.downcase
@@ -699,7 +699,7 @@ module UUIDTools
       if byte_string.respond_to?(:force_encoding)
         byte_string.force_encoding(Encoding::ASCII_8BIT)
       end
-      for i in 0..(size - 1)
+      size.times do |i|
         byte_string << ((integer >> (((size - 1) - i) * 8)) & 0xFF)
       end
       return byte_string
@@ -713,7 +713,7 @@ module UUIDTools
       end
       integer = 0
       size = byte_string.size
-      for i in 0..(size - 1)
+      size.times do |i|
         ordinal = (byte_string[i].respond_to?(:ord) ?
           byte_string[i].ord : byte_string[i])
         integer += (ordinal << (((size - 1) - i) * 8))
