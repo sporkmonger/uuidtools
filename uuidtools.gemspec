@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--main", "README.md"]
   s.rubygems_version = "2.2.2"
   s.summary = "UUID generator"
+  s.license = "MIT"
 
   if s.respond_to? :specification_version then
     s.specification_version = 4
