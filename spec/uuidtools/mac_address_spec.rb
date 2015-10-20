@@ -249,6 +249,28 @@ describe UUIDTools::UUID, "when obtaining a MAC address" do
   end
 end
 
+describe UUIDTools::UUID, "when neither ip nor ifconfig exists" do
+  it "should not fail" do
+    save_ifconfig_command = UUIDTools::UUID.ifconfig_command
+    save_ifconfig_path_default = UUIDTools::UUID.ifconfig_path_default
+    save_ip_command = UUIDTools::UUID.ip_command
+    save_ip_path_default = UUIDTools::UUID.ip_path_default
+
+    UUIDTools::UUID.ifconfig_command = "nonexistent"
+    UUIDTools::UUID.ifconfig_path_default = "/bin/nonexistent"
+    UUIDTools::UUID.ip_command = "nonexistent"
+    UUIDTools::UUID.ip_path_default = "/bin/nonexistent"
+
+    expect(UUIDTools::UUID.ifconfig).to eq('')
+
+    UUIDTools::UUID.ifconfig_command = save_ifconfig_command
+    UUIDTools::UUID.ifconfig_path_default = save_ifconfig_path_default
+    UUIDTools::UUID.ip_command = save_ip_command
+    UUIDTools::UUID.ip_path_default = save_ip_path_default
+
+  end
+end
+
 describe UUIDTools::UUID, "before obtaining a MAC address" do
 
   before do

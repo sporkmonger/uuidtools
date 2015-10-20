@@ -585,6 +585,8 @@ module UUIDTools
 
       all_switch = all == nil ? "" : "-a"
       return `#{ifconfig_path} #{all_switch}` if not ifconfig_path == nil
+    rescue
+      ''
     end
 
     # Match and return the first Mac address found
@@ -625,13 +627,14 @@ module UUIDTools
 
         os_class = UUID.os_class
 
-        if os_class == :windows
-          begin
+        begin
+          if os_class == :windows
             @@mac_address = UUID.first_mac `ipconfig /all`
-          rescue
+          else # linux, bsd, macos, solaris
+            @@mac_address = UUID.first_mac(UUID.ifconfig(:all))
           end
-        else # linux, bsd, macos, solaris
-          @@mac_address = UUID.first_mac(UUID.ifconfig(:all))
+        rescue
+          @@mac_address = nil
         end
 
         if @@mac_address != nil
