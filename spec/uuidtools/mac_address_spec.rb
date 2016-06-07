@@ -261,13 +261,12 @@ describe UUIDTools::UUID, "when neither ip nor ifconfig exists" do
     UUIDTools::UUID.ip_command = "nonexistent"
     UUIDTools::UUID.ip_path_default = "/bin/nonexistent"
 
-    expect(UUIDTools::UUID.ifconfig).to eq('')
+    expect(UUIDTools::UUID.ifconfig).to eq("")
 
     UUIDTools::UUID.ifconfig_command = save_ifconfig_command
     UUIDTools::UUID.ifconfig_path_default = save_ifconfig_path_default
     UUIDTools::UUID.ip_command = save_ip_command
     UUIDTools::UUID.ip_path_default = save_ip_path_default
-
   end
 end
 

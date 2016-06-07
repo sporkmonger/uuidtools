@@ -586,7 +586,7 @@ module UUIDTools
       all_switch = all == nil ? "" : "-a"
       return `#{ifconfig_path} #{all_switch}` if not ifconfig_path == nil
     rescue
-      ''
+      ""
     end
 
     # Match and return the first Mac address found
