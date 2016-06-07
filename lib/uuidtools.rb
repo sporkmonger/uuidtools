@@ -627,15 +627,16 @@ module UUIDTools
 
         os_class = UUID.os_class
 
-        begin
-          if os_class == :windows
-            @@mac_address = UUID.first_mac `ipconfig /all`
-          else # linux, bsd, macos, solaris
-            @@mac_address = UUID.first_mac(UUID.ifconfig(:all))
+        @@mac_address =
+          begin
+            if os_class == :windows
+              UUID.first_mac(`ipconfig /all`)
+            else # linux, bsd, macos, solaris
+              UUID.first_mac(UUID.ifconfig(:all))
+            end
+          rescue
+            nil
           end
-        rescue
-          @@mac_address = nil
-        end
 
         if @@mac_address != nil
           if @@mac_address.respond_to?(:to_str)
