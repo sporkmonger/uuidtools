@@ -584,7 +584,7 @@ module UUIDTools
       end
 
       if !(ifconfig_path == nil)
-        return `#{ifconfig_path} ""` if all.blank?
+        return `#{ifconfig_path} ""` if all == nil
         return `#{ifconfig_path} a`
       end
     end
