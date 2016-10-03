@@ -583,7 +583,7 @@ module UUIDTools
         all = nil
       end
 
-      if ifconfig_path.present?
+      if !(ifconfig_path == nil)
         return `#{ifconfig_path} ""` if all.blank?
         return `#{ifconfig_path} a`
       end
