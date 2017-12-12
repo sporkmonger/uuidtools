@@ -94,7 +94,7 @@ describe UUIDTools::UUID, "when parsing" do
   it "should produce a sane hash value for a UUID" do
     uuid = UUIDTools::UUID.new(0, 0, 0, 0, 0, [0, 0, 0, 0, 0, 0])
     expect(uuid.to_i).to eql(0)
-    expect(uuid.hash).to be_kind_of(Fixnum)
+    expect(uuid.hash).to be_kind_of(Integer)
   end
 
   it "should produce the correct URI for a UUID" do
