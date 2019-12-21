@@ -24,7 +24,7 @@ require 'thread'
 require 'digest/sha1'
 require 'digest/md5'
 
-require 'uuidtools/version'
+require_relative 'uuidtools/version'
 
 begin
   require 'securerandom'
