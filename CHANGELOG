@@ -1,3 +1,6 @@
+== UUIDTools 2.2.0
+ * drop support for ruby < 2.3
+ * use Integer vs Fixnum
 == UUIDTools 2.1.5
  * fixed issue with ip command vs ifconfig
  * dumped RubyForge related cruft
