@@ -178,19 +178,52 @@ module UUIDTools
         raise TypeError,
           "Expected String, got #{raw_string.class.name} instead."
       end
-      integer = self.convert_byte_string_to_int(raw_string)
 
-      time_low = (integer >> 96) & 0xFFFFFFFF
-      time_mid = (integer >> 80) & 0xFFFF
-      time_hi_and_version = (integer >> 64) & 0xFFFF
-      clock_seq_hi_and_reserved = (integer >> 56) & 0xFF
-      clock_seq_low = (integer >> 48) & 0xFF
-      nodes = []
-      6.times do |i|
-        nodes << ((integer >> (40 - (i * 8))) & 0xFF)
+      if raw_string.respond_to?(:force_encoding)
+        raw_string.force_encoding(Encoding::ASCII_8BIT)
       end
+
+      raw_length = raw_string.length
+      if raw_length < 16
+        # Option A: Enforce raw_string be 16 characters (More strict)
+        #raise ArgumentError,
+        #  "Expected 16 bytes, got #{raw_string.length} instead."
+
+        # Option B: Pad raw_string to 16 characters (Compatible with existing behavior)
+        raw_string = raw_string.rjust(16, "\0")
+      elsif raw_length > 16
+        # NOTE: As per "Option B" above, existing behavior would use the lower
+        # 128-bits of an overly long raw_string instead of using the upper 128-bits.
+        start_index = raw_length - 16
+        raw_string = raw_string[start_index...raw_length]
+      end
+
+      raw_bytes = []
+      if raw_string[0].respond_to? :ord
+        for i in 0...raw_string.size
+          raw_bytes << raw_string[i].ord
+        end
+      else
+        raw_bytes = raw_string
+      end
+
+      time_low = ((raw_bytes[0] << 24) +
+                  (raw_bytes[1] << 16)  +
+                  (raw_bytes[2] << 8)  +
+                   raw_bytes[3])
+      time_mid = ((raw_bytes[4] << 8) +
+                   raw_bytes[5])
+      time_hi_and_version = ((raw_bytes[6] << 8) +
+                              raw_bytes[7])
+      clock_seq_hi_and_reserved = raw_bytes[8]
+      clock_seq_low = raw_bytes[9]
+      nodes = []
+      for i in 10...16
+        nodes << raw_bytes[i]
+      end
+
       return self.new(time_low, time_mid, time_hi_and_version,
-        clock_seq_hi_and_reserved, clock_seq_low, nodes)
+                      clock_seq_hi_and_reserved, clock_seq_low, nodes)
     end
 
     ##
@@ -200,17 +233,42 @@ module UUIDTools
         raise ArgumentError,
           "Expected Integer, got #{uuid_int.class.name} instead."
       end
-      return self.parse_raw(self.convert_int_to_byte_string(uuid_int, 16))
+
+      time_low = (uuid_int >> 96) & 0xFFFFFFFF
+      time_mid = (uuid_int >> 80) & 0xFFFF
+      time_hi_and_version = (uuid_int >> 64) & 0xFFFF
+      clock_seq_hi_and_reserved = (uuid_int >> 56) & 0xFF
+      clock_seq_low = (uuid_int >> 48) & 0xFF
+      nodes = []
+      for i in 0..5
+        nodes << ((uuid_int >> (40 - (i * 8))) & 0xFF)
+      end
+
+      return self.new(time_low, time_mid, time_hi_and_version,
+                      clock_seq_hi_and_reserved, clock_seq_low, nodes)
     end
 
     ##
     # Parse a UUID from a hexdigest String.
-    def self.parse_hexdigest(uuid_hexdigest)
-      unless uuid_hexdigest.kind_of?(String)
+    def self.parse_hexdigest(uuid_hex)
+      unless uuid_hex.kind_of?(String)
         raise ArgumentError,
-          "Expected String, got #{uuid_hexdigest.class.name} instead."
+          "Expected String, got #{uuid_hex.class.name} instead."
       end
-      return self.parse_int(uuid_hexdigest.to_i(16))
+
+      time_low = uuid_hex[0...8].to_i(16)
+      time_mid = uuid_hex[8...12].to_i(16)
+      time_hi_and_version = uuid_hex[12...16].to_i(16)
+      clock_seq_hi_and_reserved = uuid_hex[16...18].to_i(16)
+      clock_seq_low = uuid_hex[18...20].to_i(16)
+      nodes_string = uuid_hex[20...32]
+      nodes = []
+      for i in 0..5
+        nodes << nodes_string[(i * 2)..(i * 2) + 1].to_i(16)
+      end
+
+      return self.new(time_low, time_mid, time_hi_and_version,
+                      clock_seq_hi_and_reserved, clock_seq_low, nodes)
     end
 
     ##
@@ -711,13 +769,19 @@ module UUIDTools
       if byte_string.respond_to?(:force_encoding)
         byte_string.force_encoding(Encoding::ASCII_8BIT)
       end
+
       integer = 0
       size = byte_string.size
-      size.times do |i|
-        ordinal = (byte_string[i].respond_to?(:ord) ?
-          byte_string[i].ord : byte_string[i])
-        integer += (ordinal << (((size - 1) - i) * 8))
+      if byte_string[0].respond_to? :ord
+        for i in 0...size
+          integer += (byte_string[i].ord << (((size - 1) - i) * 8))
+        end
+      else
+        for i in 0...size
+          integer += (byte_string[i] << (((size - 1) - i) * 8))
+        end
       end
+      
       return integer
     end
   end
