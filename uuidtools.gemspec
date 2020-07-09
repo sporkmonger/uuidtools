@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README.md"]
   s.files = ["CHANGELOG", "LICENSE.txt", "README.md", "Rakefile", "lib/compat", "lib/compat/securerandom.rb", "lib/uuidtools", "lib/uuidtools.rb", "lib/uuidtools/version.rb", "spec/spec.opts", "spec/spec_helper.rb", "spec/uuidtools", "spec/uuidtools/mac_address_spec.rb", "spec/uuidtools/utility_spec.rb", "spec/uuidtools/uuid_creation_spec.rb", "spec/uuidtools/uuid_parsing_spec.rb", "tasks/benchmark.rake", "tasks/gem.rake", "tasks/git.rake", "tasks/metrics.rake", "tasks/rspec.rake", "tasks/yard.rake", "website/index.html"]
   s.homepage = "https://github.com/sporkmonger/uuidtools"
+  s.license = "Apache-2.0"
   s.rdoc_options = ["--main", "README.md"]
   s.rubygems_version = "2.2.2"
   s.summary = "UUID generator"
