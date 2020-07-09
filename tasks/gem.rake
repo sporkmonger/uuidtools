@@ -43,7 +43,7 @@ namespace :gem do
   task :gemspec do
     spec_string = GEM_SPEC.to_ruby
 
-    File.open("#{GEM_SPEC.name}.gemspec", 'w') do |file|
+    File.open("#{GEM_SPEC.name}.gemspec", "w") do |file|
       file.write spec_string
     end
   end
