@@ -21,8 +21,8 @@ unless defined? UUIDTools::VERSION
   module UUIDTools
     module VERSION #:nodoc:
       MAJOR = 2
-      MINOR = 1
-      TINY  = 5
+      MINOR = 2
+      TINY  = 0
 
       STRING = [MAJOR, MINOR, TINY].join('.')
     end

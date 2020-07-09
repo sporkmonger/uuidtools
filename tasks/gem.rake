@@ -43,14 +43,8 @@ namespace :gem do
   task :gemspec do
     spec_string = GEM_SPEC.to_ruby
 
-    begin
-      Thread.new { eval("$SAFE = 3\n#{spec_string}", binding) }.join
-    rescue
-      abort "unsafe gemspec: #{$!}"
-    else
-      File.open("#{GEM_SPEC.name}.gemspec", 'w') do |file|
-        file.write spec_string
-      end
+    File.open("#{GEM_SPEC.name}.gemspec", "w") do |file|
+      file.write spec_string
     end
   end
 
