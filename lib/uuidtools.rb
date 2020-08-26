@@ -641,8 +641,10 @@ module UUIDTools
         all = nil
       end
 
-      all_switch = all == nil ? "" : "-a"
-      return `#{ifconfig_path} #{all_switch}` if not ifconfig_path == nil
+      if !(ifconfig_path == nil)
+        return `#{ifconfig_path} ""` if all == nil
+        return `#{ifconfig_path} a`
+      end
     end
 
     # Match and return the first Mac address found
