@@ -585,16 +585,15 @@ module UUIDTools
     def self.os_class
       require 'rbconfig'
       os_platform = RbConfig::CONFIG['target_os']
-      os_class = nil
       if (os_platform =~ /win/i && !(os_platform =~ /darwin/i)) ||
           os_platform =~ /w32/i
-        os_class = :windows
+        :windows
       elsif os_platform =~ /solaris/i
-        os_class = :solaris
+        :solaris
       elsif os_platform =~ /netbsd/i
-        os_class = :netbsd
+        :netbsd
       elsif os_platform =~ /openbsd/i
-        os_class = :openbsd
+        :openbsd
       end
     end
 
