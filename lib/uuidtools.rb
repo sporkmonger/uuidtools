@@ -638,7 +638,7 @@ module UUIDTools
       if ifconfig_path == nil
         ip_path = UUID.ip_path
         # check to make sure ip exists
-        if !iip_path.nil?
+        unless ip_path.nil?
           ifconfig_path = "#{ip_path} addr list"
           # all makes no sense when using ip(1)
           all = nil
