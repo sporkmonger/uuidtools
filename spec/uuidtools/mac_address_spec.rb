@@ -213,7 +213,8 @@ samples = {
   :openbsd => openbsd_sample,
   :linux => linux_sample,
   :linux2 => linux_sample_2,
-  :linuxip => linux_ip_sample
+  :linuxip => linux_ip_sample,
+  :docker => nil
 }
 
 macs = {
@@ -450,5 +451,10 @@ describe UUIDTools::UUID, "before obtaining a MAC address" do
   it "should be able to parse ip addr output" do
     mac = UUIDTools::UUID.first_mac samples[:linuxip]
     expect(mac).to eql(macs[:linuxip])
+  end
+
+  it "should return nil when unable to identify the mac address" do
+    mac = UUIDTools::UUID.first_mac nil
+    expect(mac).to be_nil
   end
 end
