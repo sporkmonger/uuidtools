@@ -129,11 +129,11 @@ describe UUIDTools::UUID, "when parsing" do
   it "should correctly parse raw bytes" do
     # NOTE: Short Input
     expect(UUIDTools::UUID.new(0, 0, 0, 0, 0, [0, 0, 0, 0, 0, 0])).to eql(
-      UUIDTools::UUID.parse_raw(""))
+      UUIDTools::UUID.parse_raw(+""))
 
     # NOTE: Nil Input
     expect(UUIDTools::UUID.parse_raw(
-      "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+      +"\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
     )).to be_nil_uuid
 
     # NOTE: Realistic Input
