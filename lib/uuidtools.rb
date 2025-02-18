@@ -753,7 +753,7 @@ module UUIDTools
     ##
     # @api private
     def self.convert_int_to_byte_string(integer, size)
-      byte_string = ""
+      byte_string = +""
       if byte_string.respond_to?(:force_encoding)
         byte_string.force_encoding(Encoding::ASCII_8BIT)
       end
