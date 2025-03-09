@@ -1,3 +1,9 @@
+== UUIDTools 3.0.0
+ * more strict validation, accept variants with most significant bits set to 1 and 0
+ * v6, v7, v8 UUIDs are now considered valid
+ * better MAC address behavior for container environments
+ * windows MAC address detection now uses a fallback location like other OSes
+ * frozen string literal fixes
 == UUIDTools 2.2.0
  * drop support for ruby < 2.3
  * use Integer vs Fixnum
