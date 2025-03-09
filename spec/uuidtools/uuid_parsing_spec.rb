@@ -64,6 +64,18 @@ describe UUIDTools::UUID, "when parsing" do
     expect(UUIDTools::UUID.new(0, 0, 0, 0, 0, [0, 0, 0, 0, 0, 0])).not_to be_valid
   end
 
+  it "should not identify UUIDs prefixed by other strings as valid" do
+    expect do
+      UUIDTools::UUID.parse("bogus\n#{UUIDTools::UUID.random_create}")
+    end.to raise_error(ArgumentError)
+  end
+
+  it "should not identify UUIDs suffixed by other strings as valid" do
+    expect do
+      UUIDTools::UUID.parse("#{UUIDTools::UUID.random_create}\nbogus")
+    end.to raise_error(ArgumentError)
+  end
+
   it "should allow for sorting of UUID arrays" do
     uuids = []
     1000.times do
