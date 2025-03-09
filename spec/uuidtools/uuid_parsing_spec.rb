@@ -76,6 +76,10 @@ describe UUIDTools::UUID, "when parsing" do
     end.to raise_error(ArgumentError)
   end
 
+  it "should parse v7 UUIDs as valid" do
+    expect(UUIDTools::UUID.parse("01957ca6-fc1a-7322-956e-e9e6c53cab55")).to be_valid
+  end
+
   it "should allow for sorting of UUID arrays" do
     uuids = []
     1000.times do
