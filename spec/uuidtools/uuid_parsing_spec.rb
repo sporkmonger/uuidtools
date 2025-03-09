@@ -25,6 +25,7 @@ describe UUIDTools::UUID, "when parsing" do
   end
 
   it "should not treat a timestamp version UUID as a random node UUID" do
+    allow(UUIDTools::UUID).to receive(:mac_address) { "aa:bb:cc:dd:ee:ff" }
     expect(UUIDTools::UUID.timestamp_create).not_to be_random_node_id
   end
 
