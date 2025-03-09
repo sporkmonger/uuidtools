@@ -630,22 +630,21 @@ module UUIDTools
     # Call the ifconfig or ip command that is found
     #
     def self.ifconfig(all=nil)
-      # find the path of the ifconfig command
       ifconfig_path = UUID.ifconfig_path
-
-      # if it does not exist, try the ip command
-      if ifconfig_path == nil
-        ifconfig_path = "#{UUID.ip_path} addr list"
-        # all makes no sense when using ip(1)
-        all = nil
-      end
-
-      all_switch = all == nil ? "" : "-a"
-      return `#{ifconfig_path} #{all_switch}` if not ifconfig_path == nil
+      ip_path = UUID.ip_path
+      command =
+        if ifconfig_path
+          "#{ifconfig_path}#{all ? ' -a' : ''}"
+        elsif ip_path
+          "#{ip_path} addr list"
+        end
+      `#{command}` if command
     end
 
     # Match and return the first Mac address found
     def self.first_mac(instring)
+      return nil if instring.nil?
+
       mac_regexps = [
         Regexp.new("address:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
         Regexp.new("addr:? (#{(["[0-9a-fA-F]{2}"] * 6).join(":")})"),
@@ -678,6 +677,7 @@ module UUIDTools
     # Returns nil if a MAC address could not be found.
     def self.mac_address
       if !defined?(@@mac_address)
+        @@mac_address = nil
         require 'rbconfig'
 
         os_class = UUID.os_class
@@ -687,8 +687,12 @@ module UUIDTools
             @@mac_address = UUID.first_mac `ipconfig /all`
           rescue
           end
-        else # linux, bsd, macos, solaris
-          @@mac_address = UUID.first_mac(UUID.ifconfig(:all))
+        else
+          ifconfig_output = UUID.ifconfig(:all)
+          if ifconfig_output
+            # linux, bsd, macos, solaris
+            @@mac_address = UUID.first_mac ifconfig_output
+          end
         end
 
         if @@mac_address != nil
