@@ -630,10 +630,12 @@ module UUIDTools
     # Call the ifconfig or ip command that is found
     #
     def self.ifconfig(all=nil)
+      ifconfig_path = UUID.ifconfig_path
+      ip_path = UUID.ip_path
       command =
-        if ifconfig_path=UUID.ifconfig_path
-          "#{ifconfig_path}#{all ? " -a" : ""}"
-        elsif ip_path=UUID.ip_path
+        if ifconfig_path
+          "#{ifconfig_path}#{all ? ' -a' : ''}"
+        elsif ip_path
           "#{ip_path} addr list"
         end
       `#{command}` if command
@@ -685,9 +687,12 @@ module UUIDTools
             @@mac_address = UUID.first_mac `ipconfig /all`
           rescue
           end
-        elsif ifconfig_output=UUID.ifconfig(:all)
-          # linux, bsd, macos, solaris
-          @@mac_address = UUID.first_mac ifconfig_output
+        else
+          ifconfig_output = UUID.ifconfig(:all)
+          if ifconfig_output
+            # linux, bsd, macos, solaris
+            @@mac_address = UUID.first_mac ifconfig_output
+          end
         end
 
         if @@mac_address != nil
