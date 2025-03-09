@@ -593,14 +593,26 @@ module UUIDTools
     end
 
     # making these class variables helps with testing
+    @ipconfig_command = "ipconfig"
+    @ipconfig_path_default = "c:\\windows\\system32\\ipconfig.exe"
     @ifconfig_command = "ifconfig"
     @ifconfig_path_default = "/sbin/ifconfig"
     @ip_command = "ip"
     @ip_path_default = "/sbin/ip"
 
     class << self
+      attr_accessor :ipconfig_command, :ipconfig_path_default
       attr_accessor :ifconfig_command, :ifconfig_path_default
       attr_accessor :ip_command, :ip_path_default
+    end
+
+    #
+    # Find the path of the ipconfig command if it is present
+    #
+    def self.ipconfig_path
+      path = `where #{UUID.ipconfig_command}`.strip
+      path = UUID.ipconfig_path_default if (path == "" && File.exist?(UUID.ipconfig_path_default))
+      return (path === "" ? nil : path)
     end
 
     #
@@ -619,6 +631,18 @@ module UUIDTools
       path = `which #{UUID.ip_command} 2>/dev/null`.strip
       path = UUID.ip_path_default if (path == "" && File.exist?(UUID.ip_path_default))
       return (path === "" ? nil : path)
+    end
+
+    #
+    # Call the ipconfig command that is found
+    #
+    def self.ipconfig(all=nil)
+      ipconfig_path = UUID.ipconfig_path
+      command =
+        if ipconfig_path
+          "#{ipconfig_path}#{all ? ' /all' : ''}"
+        end
+      `#{command}` if command
     end
 
     #
@@ -679,7 +703,8 @@ module UUIDTools
 
         if os_class == :windows
           begin
-            @@mac_address = UUID.first_mac `ipconfig /all`
+            ipconfig_output = UUID.ipconfig(:all)
+            @@mac_address = UUID.first_mac ipconfig_output
           rescue
           end
         else

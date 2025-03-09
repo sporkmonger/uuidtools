@@ -261,49 +261,57 @@ describe UUIDTools::UUID, "before obtaining a MAC address" do
   end
 
   it "should parse windows MAC addresses" do
-    # mock ifconfig() to return the windows sample
-    allow(UUIDTools::UUID).to receive(:ifconfig) { samples[:windows] }
+    # mock os_class() so that we don't get different mock behavior on windows
+    allow(UUIDTools::UUID).to receive(:os_class) { :windows }
+    allow(UUIDTools::UUID).to receive(:ipconfig) { samples[:windows] }
     mac = UUIDTools::UUID.mac_address
     expect(mac).to eql(macs[:windows])
   end
 
   it "should parse solaris MAC addresses" do
+    allow(UUIDTools::UUID).to receive(:os_class) { :solaris }
     allow(UUIDTools::UUID).to receive(:ifconfig) { samples[:solaris] }
     mac = UUIDTools::UUID.mac_address
     expect(mac).to eql(macs[:solaris])
   end
 
   it "should parse freebsd MAC addresses" do
+    allow(UUIDTools::UUID).to receive(:os_class) { nil }
     allow(UUIDTools::UUID).to receive(:ifconfig) { samples[:freebsd] }
     mac = UUIDTools::UUID.mac_address
     expect(mac).to eql(macs[:freebsd])
   end
 
   it "should parse openbsd MAC addresses" do
+    allow(UUIDTools::UUID).to receive(:os_class) { :openbsd }
     allow(UUIDTools::UUID).to receive(:ifconfig) { samples[:openbsd] }
     mac = UUIDTools::UUID.mac_address
     expect(mac).to eql(macs[:openbsd])
   end
 
   it "should parse linux MAC addresses with ifconfig" do
+    allow(UUIDTools::UUID).to receive(:os_class) { nil }
     allow(UUIDTools::UUID).to receive(:ifconfig) { samples[:linux] }
     mac = UUIDTools::UUID.mac_address
     expect(mac).to eql(macs[:linux])
   end
 
   it "should parse a linux HWaddr address with ifconfig" do
+    allow(UUIDTools::UUID).to receive(:os_class) { nil }
     allow(UUIDTools::UUID).to receive(:ifconfig) { samples[:linux2] }
     mac = UUIDTools::UUID.mac_address
     expect(mac).to eql(macs[:linux2])
   end
 
   it "should parse macos MAC addresses with ifconfig" do
+    allow(UUIDTools::UUID).to receive(:os_class) { nil }
     allow(UUIDTools::UUID).to receive(:ifconfig) { samples[:macos] }
     mac = UUIDTools::UUID.mac_address
     expect(mac).to eql(macs[:macos])
   end
 
   it "should parse linux MAC addresses with ip" do
+    allow(UUIDTools::UUID).to receive(:os_class) { nil }
     allow(UUIDTools::UUID).to receive(:ifconfig) { samples[:linuxip] }
     mac = UUIDTools::UUID.mac_address
     expect(mac).to eql(macs[:linuxip])
