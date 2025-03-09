@@ -54,77 +54,77 @@ describe UUIDTools::UUID, "when generating" do
   end
 
   it "should throw an exception if a segment has an invalid value" do
-    expect(lambda do
+    expect do
       UUIDTools::UUID.new(-1, 0, 0, 0, 0, [0, 0, 0, 0, 0, 0])
-    end).to raise_error(ArgumentError)
-    expect(lambda do
+    end.to raise_error(ArgumentError)
+    expect do
       UUIDTools::UUID.new(4294967296, 0, 0, 0, 0, [0, 0, 0, 0, 0, 0])
-    end).to raise_error(ArgumentError)
+    end.to raise_error(ArgumentError)
   end
 
   it "should throw an exception if a segment has an invalid value" do
-    expect(lambda do
+    expect do
       UUIDTools::UUID.new(0, -1, 0, 0, 0, [0, 0, 0, 0, 0, 0])
-    end).to raise_error(ArgumentError)
-    expect(lambda do
+    end.to raise_error(ArgumentError)
+    expect do
       UUIDTools::UUID.new(0, 65536, 0, 0, 0, [0, 0, 0, 0, 0, 0])
-    end).to raise_error(ArgumentError)
+    end.to raise_error(ArgumentError)
   end
 
   it "should throw an exception if a segment has an invalid value" do
-    expect(lambda do
+    expect do
       UUIDTools::UUID.new(0, 0, -1, 0, 0, [0, 0, 0, 0, 0, 0])
-    end).to raise_error(ArgumentError)
-    expect(lambda do
+    end.to raise_error(ArgumentError)
+    expect do
       UUIDTools::UUID.new(0, 0, 65536, 0, 0, [0, 0, 0, 0, 0, 0])
-    end).to raise_error(ArgumentError)
+    end.to raise_error(ArgumentError)
   end
 
   it "should throw an exception if a segment has an invalid value" do
-    expect(lambda do
+    expect do
       UUIDTools::UUID.new(0, 0, 0, -1, 0, [0, 0, 0, 0, 0, 0])
-    end).to raise_error(ArgumentError)
-    expect(lambda do
+    end.to raise_error(ArgumentError)
+    expect do
       UUIDTools::UUID.new(0, 0, 0, 256, 0, [0, 0, 0, 0, 0, 0])
-    end).to raise_error(ArgumentError)
+    end.to raise_error(ArgumentError)
   end
 
   it "should throw an exception if a segment has an invalid value" do
-    expect(lambda do
+    expect do
       UUIDTools::UUID.new(0, 0, 0, 0, -1, [0, 0, 0, 0, 0, 0])
-    end).to raise_error(ArgumentError)
-    expect(lambda do
+    end.to raise_error(ArgumentError)
+    expect do
       UUIDTools::UUID.new(0, 0, 0, 0, 256, [0, 0, 0, 0, 0, 0])
-    end).to raise_error(ArgumentError)
+    end.to raise_error(ArgumentError)
   end
 
   it "should throw an exception if nodes are not a collection" do
-    expect(lambda do
+    expect do
       UUIDTools::UUID.new(0, 0, 0, 0, 0, :bogus)
-    end).to raise_error(TypeError)
+    end.to raise_error(TypeError)
   end
 
   it "should throw an exception if nodes are the wrong size" do
-    expect(lambda do
+    expect do
       UUIDTools::UUID.new(0, 0, 0, 0, 0, [0, 0, 0, 0, 0])
-    end).to raise_error(ArgumentError)
+    end.to raise_error(ArgumentError)
   end
 
   it "should throw an exception if any nodes have invalid values" do
-    expect(lambda do
+    expect do
       UUIDTools::UUID.new(0, 0, 0, 0, 0, [0, 0, 0, 0, 0, 256])
-    end).to raise_error(ArgumentError)
+    end.to raise_error(ArgumentError)
   end
 
   it "should throw an exception if parsing anything but a String" do
-    expect(lambda do
+    expect do
       UUIDTools::UUID.parse(:bogus)
-    end).to raise_error(TypeError)
+    end.to raise_error(TypeError)
   end
 
   it "should throw an exception if raw parsing anything but a String" do
-    expect(lambda do
+    expect do
       UUIDTools::UUID.parse_raw(:bogus)
-    end).to raise_error(TypeError)
+    end.to raise_error(TypeError)
   end
 end
