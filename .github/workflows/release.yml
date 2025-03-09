@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - uuidtools-*
+
+jobs:
+  release:
+    if: github.repository == 'sporkmonger/uuidtools'
+    runs-on: ubuntu-22.04
+    permissions:
+      id-token: write # for trusted publishing
+    steps:
+      # tags are named uuidtools-VERSION, e.g. uuidtools-2.2.0
+      - name: Set VERSION from git tag
+        run: echo "VERSION=$(echo ${{ github.ref }} | cut -d - -f 2)" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          ruby-version: ruby
+
+      - uses: rubygems/configure-rubygems-credentials@v1.0.0
+
+      # ensure gem can be built and installed
+      - run: bundle exec rake gem:install
+
+      # push gem to rubygems.org
+      - run: gem push --verbose pkg/uuidtools-${VERSION}.gem
