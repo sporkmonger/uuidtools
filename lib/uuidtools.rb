@@ -611,7 +611,7 @@ module UUIDTools
     #
     def self.ipconfig_path
       path = `where #{UUID.ipconfig_command}`.strip
-      path = UUID.ipconfig_path_default if (path == "" && File.exist?(UUID.ipconfig_path_default))
+      path = UUID.ipconfig_path_default if path == "" && File.exist?(UUID.ipconfig_path_default)
       return (path === "" ? nil : path)
     end
 
@@ -620,7 +620,7 @@ module UUIDTools
     #
     def self.ifconfig_path
       path = `which #{UUID.ifconfig_command} 2>/dev/null`.strip
-      path = UUID.ifconfig_path_default if (path == "" && File.exist?(UUID.ifconfig_path_default))
+      path = UUID.ifconfig_path_default if path == "" && File.exist?(UUID.ifconfig_path_default)
       return (path === "" ? nil : path)
     end
 
@@ -629,14 +629,14 @@ module UUIDTools
     #
     def self.ip_path
       path = `which #{UUID.ip_command} 2>/dev/null`.strip
-      path = UUID.ip_path_default if (path == "" && File.exist?(UUID.ip_path_default))
+      path = UUID.ip_path_default if path == "" && File.exist?(UUID.ip_path_default)
       return (path === "" ? nil : path)
     end
 
     #
     # Call the ipconfig command that is found
     #
-    def self.ipconfig(all=nil)
+    def self.ipconfig(all = nil)
       ipconfig_path = UUID.ipconfig_path
       command =
         if ipconfig_path
@@ -648,7 +648,7 @@ module UUIDTools
     #
     # Call the ifconfig or ip command that is found
     #
-    def self.ifconfig(all=nil)
+    def self.ifconfig(all = nil)
       ifconfig_path = UUID.ifconfig_path
       ip_path = UUID.ip_path
       command =
