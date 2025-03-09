@@ -14,6 +14,7 @@ describe UUIDTools::UUID, "when generating" do
   end
 
   it "should correctly generate timestamp variant UUIDs" do
+    allow(UUIDTools::UUID).to receive(:mac_address) { "aa:bb:cc:dd:ee:ff" }
     expect(UUIDTools::UUID.timestamp_create).not_to be_random_node_id
     expect(UUIDTools::UUID.timestamp_create.to_s).not_to eql(
       UUIDTools::UUID.timestamp_create.to_s
