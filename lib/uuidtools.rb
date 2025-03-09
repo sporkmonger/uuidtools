@@ -416,12 +416,7 @@ module UUIDTools
     ##
     # Returns true if this UUID is valid.
     def valid?
-      if [0b000, 0b100, 0b110, 0b111].include?(self.variant) &&
-        (1..8).include?(self.version)
-        return true
-      else
-        return false
-      end
+      return self.variant == 0b100 && (1..8).cover?(self.version)
     end
 
     ##
