@@ -787,8 +787,8 @@ module UUIDTools
 
   ##
   # Constant Regexp that matches a UUID and captures its components.
-  UUID_REGEXP = Regexp.new("^([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-" +
-                          "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})$")
+  UUID_REGEXP = Regexp.new("\\A([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-" +
+                          "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})\\z")
 
   ##
   # Constant that represents the DNS namespace.
