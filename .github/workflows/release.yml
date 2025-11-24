@@ -16,7 +16,7 @@ jobs:
       - name: Set VERSION from git tag
         run: echo "VERSION=$(echo ${{ github.ref }} | cut -d - -f 2)" >> "$GITHUB_ENV"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: ruby/setup-ruby@v1
         with:
